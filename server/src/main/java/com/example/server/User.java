@@ -1,5 +1,6 @@
 package com.example.server;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,7 +10,9 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
+  @Column(unique = true)
   private String email;
+  @JsonIgnore // removes password when sending response
   private String password;
   private String name;
 
