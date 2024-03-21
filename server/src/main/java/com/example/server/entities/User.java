@@ -1,4 +1,4 @@
-package com.example.server;
+package com.example.server.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -28,12 +28,9 @@ public class User {
   public Integer getId() {
     return this.id;
   }
-  public String getEmail() {
-    return this.email;
-  }
-  public String getPassword() {
-    return this.password;
-  }
+  public String getEmail() { return this.email; }
+  public String getPassword() { return this.password; }
+
   public String getName() {
     return this.name;
   }

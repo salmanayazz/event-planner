@@ -1,5 +1,7 @@
-package com.example.server;
+package com.example.server.controllers;
 
+import com.example.server.entities.User;
+import com.example.server.repositories.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
