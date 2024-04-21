@@ -16,11 +16,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        // userId acts as the spring security username
+        return loadUserById(Long.parseLong(userId));
+    }
+    @Transactional
+    public UserDetails loadUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with ID: " + userId));
 
         return UserDetailsImpl.build(user);
     }
-
 }
