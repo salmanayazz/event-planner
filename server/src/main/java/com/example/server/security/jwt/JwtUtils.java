@@ -56,6 +56,10 @@ public class JwtUtils {
         return null;
     }
 
+    public Long getUserIdFromRequest(HttpServletRequest request) {
+        return getUserIdFromJwtToken(parseJwt(request));
+    }
+
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);

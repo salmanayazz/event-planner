@@ -42,9 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // store accessToken in local storage so it can be used by the axios instance
       const { accessToken } = response.data;
-      console.log(response);
       localStorage.setItem("accessToken", accessToken);
-      axiosInstance.get(`test/user`);
       setAuthState({ ...authState, user: response.data.user, loading: false });
     } catch (error: unknown) {
       console.log(error);
