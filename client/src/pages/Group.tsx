@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/auth/AuthContext";
 
 export default function Group() {
-  const { groups, addUserToGroup } = useGroups();
+  const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();
   const { authState } = useAuth();
   const groupId = Number(useParams<{ groupId: string }>().groupId);
   const group = groups.find((group) => group.id === groupId);
@@ -15,26 +15,28 @@ export default function Group() {
     <VStack spacing={4} align="start" mt={4}>
       <h1>{group?.name}</h1>
       <h2>Members:</h2>
-      {group?.members.map((username) => (
-        <p key={username}>{username}</p>
+      <h3>{group?.owner.username}</h3>
+      {group?.members.map((user, index) => (
+        <Button
+          key={user.id + index}
+          onClick={() => deleteUserFromGroup(groupId, user.id)}
+        >
+          {user.username}
+        </Button>
       ))}
 
-      {group?.owner.username === authState.user?.username && (
-        <>
-          <h2>Add a friend:</h2>
-          <Input
-            placeholder="Enter friend's username"
-            value={newUser}
-            onChange={(event) => setNewUser(event.target.value)}
-          />
-          <Button
-            colorScheme="green"
-            onClick={() => addUserToGroup(groupId, newUser)}
-          >
-            Confirm
-          </Button>
-        </>
-      )}
+      <h2>Add a friend:</h2>
+      <Input
+        placeholder="Enter friend's username"
+        value={newUser}
+        onChange={(event) => setNewUser(event.target.value)}
+      />
+      <Button
+        colorScheme="green"
+        onClick={() => addUserToGroup(groupId, newUser)}
+      >
+        Confirm
+      </Button>
     </VStack>
   );
 }

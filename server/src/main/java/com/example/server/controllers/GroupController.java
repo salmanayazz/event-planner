@@ -13,8 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -33,7 +33,6 @@ public class GroupController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getGroups(HttpServletRequest request) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
-        System.out.println("User ID: " + userId);
         Group[] groups = groupRepository.findByUserId(userId).toArray(new Group[0]);
 
         GetGroupsResponse[] res = new GetGroupsResponse[groups.length];
@@ -41,19 +40,19 @@ public class GroupController {
             res[i] = new GetGroupsResponse();
             res[i].id = groups[i].getId();
             res[i].name = groups[i].getName();
-            res[i].owner = groups[i].getOwner().getUsername();
-            res[i].members = groups[i].getMembers().stream().map(User::getUsername).collect(Collectors.toList());
+            res[i].owner = groups[i].getOwner();
+            res[i].members = groups[i].getMembers();
         }
 
         return ResponseEntity.ok().body(res);
 
     }
 
-    static class GetGroupsResponse { // TODO: move to a separate file
+    static class GetGroupsResponse {
         public Long id;
         public String name;
-        public String owner;
-        public List<String> members;
+        public User owner;
+        public List<User> members;
     }
 
     @PostMapping
@@ -89,9 +88,9 @@ public class GroupController {
             return ResponseEntity.badRequest().body("Invalid group ID");
         }
 
-        Group group = groupRepository.findIfJoined(userId, groupId);
+        Group group = groupRepository.findJoined(userId, groupId);
         if (group == null) {
-            return ResponseEntity.badRequest().body("Group not found");
+            return ResponseEntity.badRequest().body("Unauthorized or group not found");
         }
 
         User user = userRepository.findByUsername(req.username);
@@ -106,5 +105,36 @@ public class GroupController {
 
     static class AddUserRequest {
         public String username;
+    }
+
+    @DeleteMapping("/{groupId}/users/{userId}")
+    @PreAuthorize("hasRole('USER')")
+    ResponseEntity<?> removeUser(@PathVariable("groupId") String groupIdString, @PathVariable("userId") String userIdToRemoveString, HttpServletRequest request) {
+        Long groupId = null;
+        Long userIdToRemove = null;
+        try {
+            groupId = Long.parseLong(groupIdString);
+            userIdToRemove = Long.parseLong(userIdToRemoveString);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid group or user ID");
+        }
+
+        Long userId = jwtUtils.getUserIdFromRequest(request);
+        Group group = groupRepository.findOwned(userId, groupId);
+        if (group == null) {
+            return ResponseEntity.badRequest().body("Unauthorized or group not found");
+        }
+
+        List<User> members = group.getMembers();
+        for (User member: members) {
+            if (Objects.equals(member.getId(), userIdToRemove)) {
+                members.remove(member);
+                group.setMembers(members);
+                groupRepository.save(group);
+                break;
+            }
+        }
+
+        return ResponseEntity.ok().body("Removed user from group successfully");
     }
 }

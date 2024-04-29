@@ -5,7 +5,7 @@ export interface Group {
   id: number;
   name: string;
   owner: User;
-  members: Array<string>;
+  members: Array<User>;
 }
 
 export interface GroupsContextType {
@@ -13,6 +13,7 @@ export interface GroupsContextType {
   getGroups: () => Promise<void>;
   createGroup: (groupName: string) => Promise<void>;
   addUserToGroup: (groupId: number, username: string) => Promise<void>;
+  deleteUserFromGroup: (groupId: number, userId: number) => Promise<void>;
 }
 
 export const useGroups = () => {
