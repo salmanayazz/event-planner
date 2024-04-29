@@ -1,11 +1,9 @@
 package com.example.server.entities;
 
-import java.util.Collection;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "groups")
@@ -21,13 +19,13 @@ public class Group {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    // @ManyToMany
-    // @JoinTable(
-    //         name = "group_members",
-    //         joinColumns = @JoinColumn(name = "group_id"),
-    //         inverseJoinColumns = @JoinColumn(name = "user_id")
-    // )
-    // private List<User> members = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "group_members",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> members = new ArrayList<>();
 
     public void setName(String name) {
         this.name = name;
@@ -37,21 +35,21 @@ public class Group {
         this.owner = owner;
     }
 
-    // public void addMember(User user) {
-    //     this.members.add(user);
-    // }
+    public void addMember(User user) {
+        this.members.add(user);
+    }
 
     public String toString() {
         return "Group{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", owner=" + owner +
-                //", members=" + members +
+                ", members=" + members +
                 '}';
     }
 
-    public Collection<Group> getMembers() {
-        return null;
+    public List<User> getMembers() {
+        return members;
     }
 
     public User getOwner() {

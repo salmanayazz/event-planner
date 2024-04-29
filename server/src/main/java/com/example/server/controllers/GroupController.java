@@ -6,12 +6,13 @@ import com.example.server.repositories.GroupRepository;
 import com.example.server.repositories.UserRepository;
 import com.example.server.security.jwt.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,66 +36,75 @@ public class GroupController {
         System.out.println("User ID: " + userId);
         Group[] groups = groupRepository.findByUserId(userId).toArray(new Group[0]);
 
-        GroupResponse[] groupResponses = new GroupResponse[groups.length];
+        GetGroupsResponse[] res = new GetGroupsResponse[groups.length];
         for (int i = 0; i < groups.length; i++) {
-            groupResponses[i] = new GroupResponse();
-            groupResponses[i].id = groups[i].getId();
-            groupResponses[i].name = groups[i].getName();
-            groupResponses[i].owner = groups[i].getOwner().getUsername();
-            //groupResponses[i].members = groups[i].getMembers().stream().map(user -> user.getName()).collect(Collectors.toList());
+            res[i] = new GetGroupsResponse();
+            res[i].id = groups[i].getId();
+            res[i].name = groups[i].getName();
+            res[i].owner = groups[i].getOwner().getUsername();
+            res[i].members = groups[i].getMembers().stream().map(User::getUsername).collect(Collectors.toList());
         }
 
-        return ResponseEntity.ok().body(groupResponses);
+        return ResponseEntity.ok().body(res);
 
     }
 
-    class GroupResponse {
+    static class GetGroupsResponse { // TODO: move to a separate file
         public Long id;
         public String name;
         public String owner;
-        //public List<String> members;
+        public List<String> members;
     }
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createGroups(@RequestBody String name, HttpServletRequest request) {
+    public ResponseEntity<?> createGroups(@Valid @RequestBody CreateGroupsRequest req, HttpServletRequest request) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
 
         Group group = new Group();
-        group.setName(name);
+        group.setName(req.name);
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            group.setOwner(user.get());
-        } else {
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().body("User not found");
         }
-        System.out.println(groupRepository.findByUserId(userId));
+
+        group.setOwner(user.get());
         groupRepository.save(group);
         return ResponseEntity.ok().body("Group created successfully");
     }
 
-    @PostMapping("/{groupId}/user")
+    static class CreateGroupsRequest {
+        public String name;
+    }
+
+    @PostMapping("/{groupId}/users")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> addUserToGroup(@RequestBody Long userId, @PathVariable String groupIdString, HttpServletRequest request) {
-        Long groupId = 0L;
+    public ResponseEntity<?> addUser(@PathVariable("groupId") String groupIdString, @Valid @RequestBody AddUserRequest req, HttpServletRequest request) {
+        Long userId = jwtUtils.getUserIdFromRequest(request);
+
+        Long groupId = null;
         try {
             groupId = Long.parseLong(groupIdString);
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("Invalid group ID");
         }
-        Group group = groupRepository.findById(groupId).orElse(null);
-        if (group != null) {
-            User user = userRepository.findById(userId).orElse(null);
-            if (user != null) {
-                group.addMember(user);
-                groupRepository.save(group);
-            } else {
-                // Handle case when user is not found
-            }
-        } else {
-            // Handle case when group is not found
+
+        Group group = groupRepository.findIfJoined(userId, groupId);
+        if (group == null) {
+            return ResponseEntity.badRequest().body("Group not found");
         }
+
+        User user = userRepository.findByUsername(req.username);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+
+        group.addMember(user);
+        groupRepository.save(group);
         return ResponseEntity.ok().body("User added to group successfully");
     }
 
+    static class AddUserRequest {
+        public String username;
+    }
 }

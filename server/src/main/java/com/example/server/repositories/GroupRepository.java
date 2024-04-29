@@ -7,6 +7,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
-    @Query("SELECT g FROM Group g WHERE g.owner.id = :id")
+    @Query("SELECT DISTINCT g FROM Group g LEFT JOIN g.members m WHERE g.owner.id = :id OR m.id = :id")
     List<Group> findByUserId(@Param("id") Long id);
+
+    @Query("SELECT g FROM Group g WHERE g.owner.id = :userId AND g.id = :groupId")
+    Group findIfOwned(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
+    @Query("SELECT g FROM Group g LEFT JOIN g.members m WHERE (g.owner.id = :userId OR m.id = :userId) AND g.id = :groupId")
+    Group findIfJoined(@Param("userId") Long userId, @Param("groupId") Long groupId);
 }

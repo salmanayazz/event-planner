@@ -5,14 +5,14 @@ export interface Group {
   id: number;
   name: string;
   owner: User;
-  user: Array<User>;
+  members: Array<string>;
 }
 
 export interface GroupsContextType {
   groups: Array<Group>;
   getGroups: () => Promise<void>;
   createGroup: (groupName: string) => Promise<void>;
-  addUserToGroup: (groupId: number, user: User) => Promise<void>;
+  addUserToGroup: (groupId: number, username: string) => Promise<void>;
 }
 
 export const useGroups = () => {

@@ -1,6 +1,5 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { GroupsContext, Group } from "./GroupsContext";
-import { User } from "../auth/AuthContext";
 import { axiosInstance } from "../AxiosInstance";
 
 interface GroupsProviderProps {
@@ -9,6 +8,10 @@ interface GroupsProviderProps {
 
 export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const [groups, setGroups] = useState<Array<Group>>([]);
+
+  useEffect(() => {
+    getGroups();
+  }, []);
 
   const getGroups = async () => {
     try {
@@ -23,16 +26,20 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
 
   const createGroup = async (groupName: string) => {
     try {
-      await axiosInstance.post(`groups`, groupName);
+      await axiosInstance.post(`groups`, {
+        name: groupName,
+      });
       getGroups();
     } catch (error: unknown) {
       console.log(error);
     }
   };
 
-  const addUserToGroup = async (groupId: number, user: User) => {
+  const addUserToGroup = async (groupId: number, username: string) => {
     try {
-      await axiosInstance.post(`groups/${groupId}/user`, user);
+      await axiosInstance.post(`groups/${groupId}/users`, {
+        username: username,
+      });
       getGroups();
     } catch (error: unknown) {
       console.log(error);

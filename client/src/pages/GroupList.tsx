@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, Input, Text, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
+import { NavLink } from "react-router-dom";
 
-const Groups: React.FC = () => {
-  const { groups, getGroups, createGroup } = useGroups();
+export default function Groups() {
+  const { groups, createGroup } = useGroups();
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [groupName, setGroupName] = useState("");
-
-  useEffect(() => {
-    getGroups();
-  }, []);
 
   const handleCreateGroup = () => {
     setShowCreateGroup(true);
@@ -22,7 +19,6 @@ const Groups: React.FC = () => {
   };
 
   const handleConfirmCreateGroup = () => {
-    // Add logic to create a new group with the given name
     createGroup(groupName);
     setShowCreateGroup(false);
     setGroupName("");
@@ -41,7 +37,9 @@ const Groups: React.FC = () => {
 
       <VStack spacing={4} align="start">
         {groups.map((group) => (
-          <Text key={group.id}>{group.name}</Text>
+          <NavLink key={group.id} to={`/groups/${group.id}`}>
+            <Text>{group.name}</Text>
+          </NavLink>
         ))}
       </VStack>
 
@@ -66,6 +64,4 @@ const Groups: React.FC = () => {
       )}
     </Box>
   );
-};
-
-export default Groups;
+}
