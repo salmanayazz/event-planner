@@ -98,6 +98,10 @@ public class GroupController {
             return ResponseEntity.badRequest().body("User not found");
         }
 
+        if (Objects.equals(group.getOwner().getId(), user.getId()) || group.getMembers().contains(user)) {
+            return ResponseEntity.badRequest().body("User already added");
+        }
+
         group.addMember(user);
         groupRepository.save(group);
         return ResponseEntity.ok().body("User added to group successfully");
