@@ -8,6 +8,7 @@ interface GroupsProviderProps {
 
 export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const [groups, setGroups] = useState<Array<Group>>([]);
+  const [events, setEvents] = useState<Array<Event>>([]);
 
   useEffect(() => {
     getGroups();
@@ -53,6 +54,27 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
     }
   };
 
+  const getEvents = async (groupId: number) => {
+    try {
+      const response = await axiosInstance.get(`groups/${groupId}/events`);
+      setEvents(response.data);
+    } catch (error: unknown) {
+      console.log(error);
+      return [];
+    }
+  };
+
+  const createEvent = async (groupId: number, eventName: string) => {
+    try {
+      await axiosInstance.post(`groups/${groupId}/events`, {
+        name: eventName,
+      });
+      getEvents(groupId);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
   return (
     <GroupsContext.Provider
       value={{
@@ -61,6 +83,9 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
         createGroup,
         addUserToGroup,
         deleteUserFromGroup,
+        events,
+        getEvents,
+        createEvent,
       }}
     >
       {children}

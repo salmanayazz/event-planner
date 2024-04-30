@@ -67,5 +67,9 @@ public class Group {
     public void setMembers(List<User> members) {
         this.members = members;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
 

@@ -1,15 +1,26 @@
 import { Button, Input, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../contexts/auth/AuthContext";
 
 export default function Group() {
-  const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();
-  const { authState } = useAuth();
+  const {
+    groups,
+    addUserToGroup,
+    deleteUserFromGroup,
+    events,
+    getEvents,
+    createEvent,
+  } = useGroups();
   const groupId = Number(useParams<{ groupId: string }>().groupId);
   const group = groups.find((group) => group.id === groupId);
+
   const [newUser, setNewUser] = useState("");
+  const [newEvent, setNewEvent] = useState("");
+
+  useEffect(() => {
+    getEvents(groupId);
+  }, [groupId]);
 
   return (
     <VStack spacing={4} align="start" mt={4}>
@@ -36,6 +47,21 @@ export default function Group() {
         onClick={() => addUserToGroup(groupId, newUser)}
       >
         Confirm
+      </Button>
+
+      <h2>Events:</h2>
+      {events?.map((event) => (
+        <h3 key={event.id}>{event.name}</h3>
+      ))}
+
+      <h2>Create an Event:</h2>
+      <Input
+        placeholder="Enter event name"
+        value={newEvent}
+        onChange={(event) => setNewEvent(event.target.value)}
+      />
+      <Button onClick={() => createEvent(groupId, newEvent)}>
+        Create Event
       </Button>
     </VStack>
   );
