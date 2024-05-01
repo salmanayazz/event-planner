@@ -2,6 +2,8 @@ import { Button, Input, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { EVENT } from "../App";
+import { NavLink } from "react-router-dom";
 
 export default function Group() {
   const {
@@ -27,9 +29,9 @@ export default function Group() {
       <h1>{group?.name}</h1>
       <h2>Members:</h2>
       <h3>{group?.owner.username}</h3>
-      {group?.members.map((user, index) => (
+      {group?.members.map((user) => (
         <Button
-          key={user.id + index}
+          key={user.id}
           onClick={() => deleteUserFromGroup(groupId, user.id)}
         >
           {user.username}
@@ -51,7 +53,9 @@ export default function Group() {
 
       <h2>Events:</h2>
       {events?.map((event) => (
-        <h3 key={event.id}>{event.name}</h3>
+        <NavLink to={EVENT(groupId, event.id)}>
+          <h3 key={event.id}>{event.name}</h3>
+        </NavLink>
       ))}
 
       <h2>Create an Event:</h2>
