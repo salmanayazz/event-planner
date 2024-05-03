@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { GroupsContext, Group } from "./GroupsContext";
+import { GroupsContext, Group, Event, Location } from "./GroupsContext";
 import { axiosInstance } from "../AxiosInstance";
 
 interface GroupsProviderProps {
@@ -9,6 +9,7 @@ interface GroupsProviderProps {
 export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const [groups, setGroups] = useState<Array<Group>>([]);
   const [events, setEvents] = useState<Array<Event>>([]);
+  const [locations, setLocations] = useState<Array<Location>>([]);
 
   useEffect(() => {
     getGroups();
@@ -75,6 +76,37 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
     }
   };
 
+  const getLocations = async (groupId: number, eventId: number) => {
+    try {
+      const response = await axiosInstance.get(
+        `groups/${groupId}/events/${eventId}/locations`
+      );
+      setLocations(response.data);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
+  const createLocation = async (
+    groupId: number,
+    eventId: number,
+    locationName: string,
+    address: string
+  ) => {
+    try {
+      await axiosInstance.post(
+        `groups/${groupId}/events/${eventId}/locations`,
+        {
+          name: locationName,
+          address: address,
+        }
+      );
+      getLocations(groupId, eventId);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
   return (
     <GroupsContext.Provider
       value={{
@@ -86,6 +118,9 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
         events,
         getEvents,
         createEvent,
+        locations,
+        getLocations,
+        createLocation,
       }}
     >
       {children}

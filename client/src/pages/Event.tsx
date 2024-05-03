@@ -20,16 +20,17 @@ import {
 } from "@react-google-maps/api";
 
 export default function EventPage() {
-  const { eventId } = useParams();
+  const { groupId, eventId } = useParams();
   const { events, locations, getLocations, createLocation } = useGroups();
-  const event = events?.find((event) => event.id === Number(eventId));
+  const event = events?.find((event: Event) => event.id === Number(eventId));
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedPlace, setSelectedPlace] = useState(null);
-  const [searchBox, setSearchBox] = useState(null);
+  const [selectedPlace, setSelectedPlace] =
+    useState<google.maps.places.PlaceResult>();
+  const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
 
   useEffect(() => {
-    getLocations(Number(eventId));
+    getLocations(Number(groupId), Number(eventId));
   }, [eventId]);
 
   useEffect(() => {
@@ -46,24 +47,33 @@ export default function EventPage() {
     if (selectedPlace) {
       const locationName = selectedPlace.name;
       const address = selectedPlace.formatted_address;
-      // createLocation(Number(eventId), locationName, address);
+
+      if (locationName && address) {
+        createLocation(Number(groupId), Number(eventId), locationName, address);
+      }
       onClose();
     }
   };
 
   const onPlacesChanged = () => {
-    setSelectedPlace(searchBox.getPlaces()[0]);
+    if (searchBox) {
+      const places = searchBox.getPlaces();
+      if (places && places.length > 0) {
+        setSelectedPlace(places[0]);
+      }
+    }
   };
 
   return (
     <>
       <h1>{event?.name}</h1>
       <h2>Locations:</h2>
-      {locations?.map((location) => (
+      {console.log(locations)}
+      {locations?.map((location: Location) => (
         <div key={location.id}>
-          {/* <h4>{location.name}</h4>
+          <h4>{location.name}</h4>
           <p>{location.address}</p>
-          <img src={location.picture} alt={location.name} /> */}
+          {/* <img src={location.picture} alt={location.name} /> */}
         </div>
       ))}
       <Button colorScheme="green" onClick={onOpen}>
@@ -77,11 +87,13 @@ export default function EventPage() {
           <ModalCloseButton />
           <ModalBody>
             <LoadScript
-              googleMapsApiKey="AIzaSyCQuOEDG85kdr2u3HrdWR9qWoa19qHivzU"
+              googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
               libraries={["places"]}
             >
               <StandaloneSearchBox
-                onLoad={(ref) => setSearchBox(ref)}
+                onLoad={(ref: google.maps.places.SearchBox) =>
+                  setSearchBox(ref)
+                }
                 onPlacesChanged={onPlacesChanged}
               >
                 <Input id="search-input" placeholder="Search for a place" />

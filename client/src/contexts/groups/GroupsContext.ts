@@ -15,6 +15,14 @@ export interface Event {
   creator: number;
 }
 
+export interface Location {
+  id: number;
+  name: string;
+  address: string;
+  event: Event;
+  creator: User;
+}
+
 export interface GroupsContextType {
   groups: Array<Group>;
   getGroups: () => Promise<void>;
@@ -24,6 +32,14 @@ export interface GroupsContextType {
   events: Array<Event>;
   getEvents: (groupId: number) => Promise<never[] | undefined>;
   createEvent: (groupId: number, eventName: string) => Promise<void>;
+  locations: Array<Location>;
+  getLocations: (groupId: number, eventId: number) => Promise<void>;
+  createLocation: (
+    groupId: number,
+    eventId: number,
+    locationName: string,
+    address: string
+  ) => Promise<void>;
 }
 
 export const useGroups = () => {
