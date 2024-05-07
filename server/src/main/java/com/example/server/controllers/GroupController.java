@@ -2,7 +2,6 @@ package com.example.server.controllers;
 
 import com.example.server.dtos.group.AddUserRequest;
 import com.example.server.dtos.group.CreateGroupRequest;
-import com.example.server.dtos.group.GetGroupsResponse;
 import com.example.server.entities.Group;
 import com.example.server.entities.User;
 import com.example.server.repositories.GroupRepository;
@@ -38,19 +37,7 @@ public class GroupController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getGroups(HttpServletRequest request) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
-        Group[] groups = groupRepository.findByUserId(userId).toArray(new Group[0]);
-
-        GetGroupsResponse[] res = new GetGroupsResponse[groups.length];
-        for (int i = 0; i < groups.length; i++) {
-            res[i] = new GetGroupsResponse();
-            res[i].id = groups[i].getId();
-            res[i].name = groups[i].getName();
-            res[i].owner = groups[i].getOwner();
-            res[i].members = groups[i].getMembers();
-        }
-
-        return ResponseEntity.ok().body(res);
-
+        return ResponseEntity.ok().body(groupRepository.findByUserId(userId));
     }
 
     @PostMapping

@@ -21,9 +21,9 @@ public class Group {
 
     @ManyToMany
     @JoinTable(
-            name = "group_members",
-            joinColumns = @JoinColumn(name = "group_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+        name = "group_members",
+        joinColumns = @JoinColumn(name = "group_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> members = new ArrayList<>();
 
@@ -41,11 +41,11 @@ public class Group {
 
     public String toString() {
         return "Group{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", owner=" + owner +
-                ", members=" + members +
-                '}';
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", owner=" + owner +
+            ", members=" + members +
+            '}';
     }
 
     public List<User> getMembers() {

@@ -1,7 +1,6 @@
 package com.example.server.controllers;
 
 import com.example.server.dtos.event.CreateEventRequest;
-import com.example.server.dtos.event.GetEventsResponse;
 import com.example.server.entities.Event;
 import com.example.server.repositories.EventRepository;
 import com.example.server.repositories.GroupRepository;
@@ -13,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -42,19 +38,8 @@ public class EventController {
         if (groupRepository.findJoined(userId, groupId) == null) {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
         }
-
-        List<Event> events = eventRepository.findEventsInGroup(groupId);
-        List<GetEventsResponse> res = new ArrayList<>();
-        for (Event event: events) {
-            GetEventsResponse eventsResponse = new GetEventsResponse();
-            eventsResponse.id = event.getId();
-            eventsResponse.name = event.getName();
-            eventsResponse.creatorId = event.getCreator().getId();
-            eventsResponse.groupId = event.getGroup().getId();
-            res.add(eventsResponse);
-        }
-
-        return ResponseEntity.ok().body(res);
+        
+        return ResponseEntity.ok().body(eventRepository.findEventsInGroup(groupId));
     }
 
     @PostMapping
