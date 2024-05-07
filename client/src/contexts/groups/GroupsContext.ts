@@ -19,6 +19,7 @@ export interface Location {
   id: number;
   name: string;
   address: string;
+  photoUrl: string;
   event: Event;
   creator: User;
 }
@@ -38,7 +39,8 @@ export interface GroupsContextType {
     groupId: number,
     eventId: number,
     locationName: string,
-    address: string
+    address: string,
+    photoUrl: string
   ) => Promise<void>;
 }
 

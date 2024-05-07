@@ -21,6 +21,9 @@ public class Location {
     @NotNull
     private String address;
 
+    @Column(length = 500)
+    private String photoUrl;
+
     @ManyToOne
     @JoinColumn(name = "creator_id")
     @NotNull
@@ -33,16 +36,17 @@ public class Location {
 
     @ManyToMany
     @JoinTable(
-            name = "location_voters",
-            joinColumns = @JoinColumn(name = "location_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+        name = "location_voters",
+        joinColumns = @JoinColumn(name = "location_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> voters = new ArrayList<>();
 
     public Location() {}
-    public Location(String name, String address, Event event, User creator) {
+    public Location(String name, String address, String photoUrl, Event event, User creator) {
         this.name = name;
         this.address = address;
+        this.photoUrl = photoUrl;
         this.event = event;
         this.creator = creator;
     }
@@ -57,6 +61,9 @@ public class Location {
 
     public String getAddress() {
         return address;
+    }
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
     public User getCreator() {

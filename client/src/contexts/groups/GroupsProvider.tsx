@@ -91,7 +91,8 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
     groupId: number,
     eventId: number,
     locationName: string,
-    address: string
+    address: string,
+    photoUrl: string
   ) => {
     try {
       await axiosInstance.post(
@@ -99,6 +100,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
         {
           name: locationName,
           address: address,
+          photoUrl: photoUrl,
         }
       );
       getLocations(groupId, eventId);

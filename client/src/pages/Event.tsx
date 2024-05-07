@@ -18,6 +18,7 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
+import { axiosInstance } from "../contexts/AxiosInstance";
 
 export default function EventPage() {
   const { groupId, eventId } = useParams();
@@ -43,13 +44,37 @@ export default function EventPage() {
     };
   }, []);
 
-  const handleCreateLocation = () => {
+  const handleCreateLocation = async () => {
     if (selectedPlace) {
       const locationName = selectedPlace.name;
       const address = selectedPlace.formatted_address;
+      const placeId = selectedPlace.place_id;
 
-      if (locationName && address) {
-        createLocation(Number(groupId), Number(eventId), locationName, address);
+      if (locationName && address && placeId) {
+        const placesService = new google.maps.places.PlacesService(
+          document.createElement("div")
+        );
+
+        placesService.getDetails(
+          {
+            placeId,
+            fields: ["photo"],
+          },
+          (placeResult, status) => {
+            if (
+              status === google.maps.places.PlacesServiceStatus.OK &&
+              placeResult
+            ) {
+              createLocation(
+                Number(groupId),
+                Number(eventId),
+                locationName,
+                address,
+                placeResult.photos?.[0].getUrl() || ""
+              );
+            }
+          }
+        );
       }
       onClose();
     }
@@ -68,14 +93,14 @@ export default function EventPage() {
     <>
       <h1>{event?.name}</h1>
       <h2>Locations:</h2>
-      {console.log(locations)}
       {locations?.map((location: Location) => (
         <div key={location.id}>
           <h4>{location.name}</h4>
           <p>{location.address}</p>
-          {/* <img src={location.picture} alt={location.name} /> */}
+          <img src={location.photoUrl} alt={location.name} />
         </div>
       ))}
+
       <Button colorScheme="green" onClick={onOpen}>
         Add a Location
       </Button>
@@ -102,8 +127,8 @@ export default function EventPage() {
                 center={
                   selectedPlace
                     ? {
-                        lat: selectedPlace.geometry.location.lat(),
-                        lng: selectedPlace.geometry.location.lng(),
+                        lat: selectedPlace.geometry?.location?.lat() || 0,
+                        lng: selectedPlace.geometry?.location?.lng() || 0,
                       }
                     : { lat: 0, lng: 0 }
                 }
@@ -113,8 +138,8 @@ export default function EventPage() {
                 {selectedPlace && (
                   <Marker
                     position={{
-                      lat: selectedPlace.geometry.location.lat(),
-                      lng: selectedPlace.geometry.location.lng(),
+                      lat: selectedPlace.geometry?.location?.lat() || 0,
+                      lng: selectedPlace.geometry?.location?.lng() || 0,
                     }}
                   />
                 )}

@@ -63,8 +63,8 @@ public class LocationController {
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> createLocation(@PathVariable("groupId") String groupIdString, @PathVariable("eventId") String eventIdString, @Valid @RequestBody CreateLocationRequest req, HttpServletRequest request) {
-        Long groupId = null;
-        Long eventId = null;
+        Long groupId;
+        Long eventId;
         try {
             groupId = Long.parseLong(groupIdString);
             eventId = Long.parseLong(eventIdString);
@@ -86,6 +86,7 @@ public class LocationController {
         Location location = new Location(
                 req.name,
                 req.address,
+                req.photoUrl,
                 event,
                 userRepository.getReferenceById(userId)
         );
@@ -96,5 +97,6 @@ public class LocationController {
     static class CreateLocationRequest {
         public String name;
         public String address;
+        public String photoUrl;
     }
 }
