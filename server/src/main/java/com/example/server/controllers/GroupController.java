@@ -20,14 +20,16 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
-    @Autowired
     GroupRepository groupRepository;
-
-    @Autowired
     UserRepository userRepository;
+    JwtUtils jwtUtils;
 
     @Autowired
-    JwtUtils jwtUtils;
+    public GroupController(GroupRepository groupRepository, UserRepository userRepository, JwtUtils jwtUtils) {
+        this.groupRepository = groupRepository;
+        this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")

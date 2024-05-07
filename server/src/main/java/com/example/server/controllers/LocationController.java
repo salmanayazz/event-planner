@@ -19,20 +19,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/groups/{groupId}/events/{eventId}/locations")
 public class LocationController {
-    @Autowired
     LocationRepository locationRepository;
-
-    @Autowired
     EventRepository eventRepository;
-
-    @Autowired
     GroupRepository groupRepository;
-
-    @Autowired
     UserRepository userRepository;
+    JwtUtils jwtUtils;
 
     @Autowired
-    JwtUtils jwtUtils;
+    public LocationController(LocationRepository locationRepository, EventRepository eventRepository, GroupRepository groupRepository, UserRepository userRepository, JwtUtils jwtUtils) {
+        this.locationRepository = locationRepository;
+        this.eventRepository = eventRepository;
+        this.groupRepository = groupRepository;
+        this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
