@@ -36,17 +36,8 @@ public class LocationController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getLocations(@PathVariable("groupId") String groupIdString, @PathVariable("eventId") String eventIdString, HttpServletRequest request) {
-        Long groupId = null;
-        Long eventId = null;
-        try {
-            groupId = Long.parseLong(groupIdString);
-            eventId = Long.parseLong(eventIdString);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid group or event ID");
-        }
-
-        Long userId = jwtUtils.getUserIdFromRequest(request);
+    public ResponseEntity<?> getLocations(@PathVariable("groupId") Long groupId, @PathVariable("eventId") Long eventId, HttpServletRequest req) {
+        Long userId = jwtUtils.getUserIdFromRequest(req);
         Group group = groupRepository.findJoined(userId, groupId);
         if (group == null) {
             return ResponseEntity.badRequest().body("Unauthorized or group does not exist");
@@ -62,17 +53,8 @@ public class LocationController {
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createLocation(@PathVariable("groupId") String groupIdString, @PathVariable("eventId") String eventIdString, @Valid @RequestBody CreateLocationRequest req, HttpServletRequest request) {
-        Long groupId;
-        Long eventId;
-        try {
-            groupId = Long.parseLong(groupIdString);
-            eventId = Long.parseLong(eventIdString);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid group or event ID");
-        }
-
-        Long userId = jwtUtils.getUserIdFromRequest(request);
+    public ResponseEntity<?> createLocation(@PathVariable("groupId") Long groupId, @PathVariable("eventId") Long eventId, @Valid @RequestBody CreateLocationRequest body, HttpServletRequest req) {
+        Long userId = jwtUtils.getUserIdFromRequest(req);
         Group group = groupRepository.findJoined(userId, groupId);
         if (group == null) {
             return ResponseEntity.badRequest().body("Unauthorized or group does not exist");
@@ -84,9 +66,9 @@ public class LocationController {
         }
 
         Location location = new Location(
-                req.name,
-                req.address,
-                req.photoUrl,
+                body.name,
+                body.address,
+                body.photoUrl,
                 event,
                 userRepository.getReferenceById(userId)
         );

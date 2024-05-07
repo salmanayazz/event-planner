@@ -33,15 +33,8 @@ public class EventController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getEvents(@PathVariable("groupId") String groupIdString, HttpServletRequest request) {
-        Long groupId = null;
-        try {
-            groupId = Long.parseLong(groupIdString);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid group ID");
-        }
-
-        Long userId = jwtUtils.getUserIdFromRequest(request);
+    public ResponseEntity<?> getEvents(@PathVariable("groupId") Long groupId, HttpServletRequest req) {
+        Long userId = jwtUtils.getUserIdFromRequest(req);
 
         if (groupRepository.findJoined(userId, groupId) == null) {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
@@ -70,21 +63,14 @@ public class EventController {
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createEvent(@PathVariable("groupId") String groupIdString, @Valid @RequestBody CreateEventRequest req, HttpServletRequest request) {
-        Long groupId = null;
-        try {
-            groupId = Long.parseLong(groupIdString);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid group ID");
-        }
-
-        Long userId = jwtUtils.getUserIdFromRequest(request);
+    public ResponseEntity<?> createEvent(@PathVariable("groupId") Long groupId, @Valid @RequestBody CreateEventRequest body, HttpServletRequest req) {
+        Long userId = jwtUtils.getUserIdFromRequest(req);
 
         if (groupRepository.findJoined(userId, groupId) == null) {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
         }
 
-        Event event = new Event(req.name, userId, groupId);
+        Event event = new Event(body.name, userId, groupId);
         eventRepository.save(event);
 
         return ResponseEntity.ok().body("Event created successfully");
@@ -93,5 +79,4 @@ public class EventController {
     static class CreateEventRequest {
         public String name;
     }
-
 }
