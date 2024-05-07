@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useGroups, Event, Location } from "../contexts/groups/GroupsContext";
 import {
   Button,
   Modal,
@@ -11,6 +10,11 @@ import {
   ModalCloseButton,
   useDisclosure,
   Input,
+  VStack,
+  Box,
+  Image,
+  Text,
+  Flex,
 } from "@chakra-ui/react";
 import {
   GoogleMap,
@@ -18,17 +22,18 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
-import { axiosInstance } from "../contexts/AxiosInstance";
+import { useGroups, Event, Location } from "../contexts/groups/GroupsContext";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
-export default function EventPage() {
+export default function Event() {
   const { groupId, eventId } = useParams();
   const { events, locations, getLocations, createLocation } = useGroups();
   const event = events?.find((event: Event) => event.id === Number(eventId));
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult>();
-  const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
+  const [searchBox, setSearchBox] =
+    useState<google.maps.places.SearchBox | null>();
 
   useEffect(() => {
     getLocations(Number(groupId), Number(eventId));
@@ -91,17 +96,50 @@ export default function EventPage() {
 
   return (
     <>
-      <h1>{event?.name}</h1>
-      <h2>Locations:</h2>
-      {locations?.map((location: Location) => (
-        <div key={location.id}>
-          <h4>{location.name}</h4>
-          <p>{location.address}</p>
-          <img src={location.photoUrl} alt={location.name} />
-        </div>
-      ))}
+      <Text fontSize="xl" fontWeight="bold" mb={4}>
+        {event?.name}
+      </Text>
 
-      <Button colorScheme="green" onClick={onOpen}>
+      <Text fontSize="lg" fontWeight="bold" mb={4}>
+        Locations
+      </Text>
+
+      <VStack spacing={4} align="stretch">
+        {locations?.map((location: Location) => (
+          <Box m={4} borderRadius="md" boxShadow="xl" key={location.id}>
+            <Image
+              src={location.photoUrl}
+              alt={location.name}
+              objectFit="cover"
+              width="100%"
+              height="200px"
+              borderTopRadius="md"
+            />
+            <Box key={location.id} p={4} bg="gray.100">
+              <Flex align="center">
+                <FaMapMarkerAlt size={24} color="blue.500" />
+                <Text ml={2} fontWeight="bold" fontSize="l">
+                  {location.name}
+                </Text>
+              </Flex>
+              <Text mt={2}>{location.address}</Text>
+              <Text mt={2}>{location.creator.username}</Text>
+              <Flex justify="space-between" mt={4}>
+                <Button colorScheme="blue" mr={4}>
+                  <Text>Vote</Text>
+                </Button>
+                <Box>
+                  {location.voters.map((voter) => (
+                    <Text key={voter.id}>{voter.username}</Text>
+                  ))}
+                </Box>
+              </Flex>
+            </Box>
+          </Box>
+        ))}
+      </VStack>
+
+      <Button colorScheme="green" onClick={onOpen} mt={4}>
         Add a Location
       </Button>
 
@@ -145,7 +183,12 @@ export default function EventPage() {
                 )}
               </GoogleMap>
             </LoadScript>
-            <Button colorScheme="green" onClick={handleCreateLocation}>
+            <Button
+              colorScheme="green"
+              onClick={handleCreateLocation}
+              mt={4}
+              width="100%"
+            >
               Confirm Location
             </Button>
           </ModalBody>

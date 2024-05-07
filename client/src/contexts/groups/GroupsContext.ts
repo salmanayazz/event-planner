@@ -22,6 +22,7 @@ export interface Location {
   photoUrl: string;
   event: Event;
   creator: User;
+  voters: Array<User>;
 }
 
 export interface GroupsContextType {
