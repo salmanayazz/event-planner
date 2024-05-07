@@ -1,19 +1,14 @@
 import { Button, Input, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
+import { useEvents } from "../contexts/events/EventsContext";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { EVENT } from "../App";
 import { NavLink } from "react-router-dom";
 
 export default function Group() {
-  const {
-    groups,
-    addUserToGroup,
-    deleteUserFromGroup,
-    events,
-    getEvents,
-    createEvent,
-  } = useGroups();
+  const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();
+  const { events, getEvents, createEvent } = useEvents();
   const groupId = Number(useParams<{ groupId: string }>().groupId);
   const group = groups.find((group) => group.id === groupId);
 

@@ -8,41 +8,12 @@ export interface Group {
   members: Array<User>;
 }
 
-export interface Event {
-  id: number;
-  name: string;
-  group: number;
-  creator: number;
-}
-
-export interface Location {
-  id: number;
-  name: string;
-  address: string;
-  photoUrl: string;
-  event: Event;
-  creator: User;
-  voters: Array<User>;
-}
-
 export interface GroupsContextType {
   groups: Array<Group>;
   getGroups: () => Promise<void>;
   createGroup: (groupName: string) => Promise<void>;
   addUserToGroup: (groupId: number, username: string) => Promise<void>;
   deleteUserFromGroup: (groupId: number, userId: number) => Promise<void>;
-  events: Array<Event>;
-  getEvents: (groupId: number) => Promise<never[] | undefined>;
-  createEvent: (groupId: number, eventName: string) => Promise<void>;
-  locations: Array<Location>;
-  getLocations: (groupId: number, eventId: number) => Promise<void>;
-  createLocation: (
-    groupId: number,
-    eventId: number,
-    locationName: string,
-    address: string,
-    photoUrl: string
-  ) => Promise<void>;
 }
 
 export const useGroups = () => {

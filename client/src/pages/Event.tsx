@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -22,12 +22,15 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
-import { useGroups, Event, Location } from "../contexts/groups/GroupsContext";
+import { useEvents, Event } from "../contexts/events/EventsContext";
+import { Location } from "../contexts/locations/LocationsContext";
+import { useLocations } from "../contexts/locations/LocationsContext";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-export default function Event() {
+export default function EventPage() {
   const { groupId, eventId } = useParams();
-  const { events, locations, getLocations, createLocation } = useGroups();
+  const { locations, getLocations, createLocation } = useLocations();
+  const { events, getEvents } = useEvents();
   const event = events?.find((event: Event) => event.id === Number(eventId));
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedPlace, setSelectedPlace] =
@@ -36,8 +39,9 @@ export default function Event() {
     useState<google.maps.places.SearchBox | null>();
 
   useEffect(() => {
+    getEvents(Number(groupId));
     getLocations(Number(groupId), Number(eventId));
-  }, [eventId]);
+  }, [groupId, eventId]);
 
   useEffect(() => {
     // force the pac-container z-index to be above the modal

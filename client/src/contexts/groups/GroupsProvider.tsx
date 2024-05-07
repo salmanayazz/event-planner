@@ -8,8 +8,6 @@ interface GroupsProviderProps {
 
 export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const [groups, setGroups] = useState<Array<Group>>([]);
-  const [events, setEvents] = useState<Array<Event>>([]);
-  const [locations, setLocations] = useState<Array<Location>>([]);
 
   useEffect(() => {
     getGroups();
@@ -55,60 +53,6 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
     }
   };
 
-  const getEvents = async (groupId: number) => {
-    try {
-      const response = await axiosInstance.get(`groups/${groupId}/events`);
-      setEvents(response.data);
-    } catch (error: unknown) {
-      console.log(error);
-      return [];
-    }
-  };
-
-  const createEvent = async (groupId: number, eventName: string) => {
-    try {
-      await axiosInstance.post(`groups/${groupId}/events`, {
-        name: eventName,
-      });
-      getEvents(groupId);
-    } catch (error: unknown) {
-      console.log(error);
-    }
-  };
-
-  const getLocations = async (groupId: number, eventId: number) => {
-    try {
-      const response = await axiosInstance.get(
-        `groups/${groupId}/events/${eventId}/locations`
-      );
-      setLocations(response.data);
-    } catch (error: unknown) {
-      console.log(error);
-    }
-  };
-
-  const createLocation = async (
-    groupId: number,
-    eventId: number,
-    locationName: string,
-    address: string,
-    photoUrl: string
-  ) => {
-    try {
-      await axiosInstance.post(
-        `groups/${groupId}/events/${eventId}/locations`,
-        {
-          name: locationName,
-          address: address,
-          photoUrl: photoUrl,
-        }
-      );
-      getLocations(groupId, eventId);
-    } catch (error: unknown) {
-      console.log(error);
-    }
-  };
-
   return (
     <GroupsContext.Provider
       value={{
@@ -117,15 +61,11 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
         createGroup,
         addUserToGroup,
         deleteUserFromGroup,
-        events,
-        getEvents,
-        createEvent,
-        locations,
-        getLocations,
-        createLocation,
       }}
     >
       {children}
     </GroupsContext.Provider>
   );
 };
+
+export default GroupsProvider;
