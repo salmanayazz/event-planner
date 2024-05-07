@@ -1,5 +1,6 @@
 package com.example.server.controllers;
 
+import com.example.server.dtos.location.CreateLocationRequest;
 import com.example.server.entities.Event;
 import com.example.server.entities.Group;
 import com.example.server.entities.Location;
@@ -74,11 +75,5 @@ public class LocationController {
         );
         locationRepository.save(location);
         return ResponseEntity.ok().body("Location added successfully");
-    }
-
-    static class CreateLocationRequest {
-        public String name;
-        public String address;
-        public String photoUrl;
     }
 }

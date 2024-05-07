@@ -1,5 +1,7 @@
 package com.example.server.controllers;
 
+import com.example.server.dtos.event.CreateEventRequest;
+import com.example.server.dtos.event.GetEventsResponse;
 import com.example.server.entities.Event;
 import com.example.server.repositories.EventRepository;
 import com.example.server.repositories.GroupRepository;
@@ -55,13 +57,6 @@ public class EventController {
         return ResponseEntity.ok().body(res);
     }
 
-    static class GetEventsResponse {
-        public Long id;
-        public String name;
-        public Long creatorId;
-        public Long groupId;
-    }
-
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> createEvent(@PathVariable("groupId") Long groupId, @Valid @RequestBody CreateEventRequest body, HttpServletRequest req) {
@@ -75,9 +70,5 @@ public class EventController {
         eventRepository.save(event);
 
         return ResponseEntity.ok().body("Event created successfully");
-    }
-
-    static class CreateEventRequest {
-        public String name;
     }
 }

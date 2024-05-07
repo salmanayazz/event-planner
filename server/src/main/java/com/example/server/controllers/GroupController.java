@@ -1,5 +1,8 @@
 package com.example.server.controllers;
 
+import com.example.server.dtos.group.AddUserRequest;
+import com.example.server.dtos.group.CreateGroupRequest;
+import com.example.server.dtos.group.GetGroupsResponse;
 import com.example.server.entities.Group;
 import com.example.server.entities.User;
 import com.example.server.repositories.GroupRepository;
@@ -50,16 +53,9 @@ public class GroupController {
 
     }
 
-    static class GetGroupsResponse {
-        public Long id;
-        public String name;
-        public User owner;
-        public List<User> members;
-    }
-
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createGroups(@Valid @RequestBody CreateGroupsRequest req, HttpServletRequest request) {
+    public ResponseEntity<?> createGroups(@Valid @RequestBody CreateGroupRequest req, HttpServletRequest request) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
 
         Group group = new Group();
@@ -72,10 +68,6 @@ public class GroupController {
         group.setOwner(user.get());
         groupRepository.save(group);
         return ResponseEntity.ok().body("Group created successfully");
-    }
-
-    static class CreateGroupsRequest {
-        public String name;
     }
 
     @PostMapping("/{groupId}/users")
@@ -107,10 +99,6 @@ public class GroupController {
         group.addMember(user);
         groupRepository.save(group);
         return ResponseEntity.ok().body("User added to group successfully");
-    }
-
-    static class AddUserRequest {
-        public String username;
     }
 
     @DeleteMapping("/{groupId}/users/{userId}")

@@ -1,9 +1,9 @@
 package com.example.server.controllers;
 
-import com.example.server.dtos.JwtResponse;
-import com.example.server.dtos.LoginRequest;
-import com.example.server.dtos.MessageResponse;
-import com.example.server.dtos.SignupRequest;
+import com.example.server.dtos.auth.JwtResponse;
+import com.example.server.dtos.auth.LoginRequest;
+import com.example.server.dtos.auth.MessageResponse;
+import com.example.server.dtos.auth.SignupRequest;
 import com.example.server.entities.User;
 import com.example.server.repositories.UserRepository;
 import com.example.server.security.jwt.JwtUtils;
@@ -38,11 +38,11 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        // get userId from email, as userId acts as the spring security username
-                        userRepository.findUserIdByEmail(loginRequest.getEmail()),
-                        loginRequest.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                // get userId from email, as userId acts as the spring security username
+                userRepository.findUserIdByEmail(loginRequest.getEmail()),
+                loginRequest.getPassword()
+            )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -51,7 +51,7 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         return ResponseEntity
-                .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail()));
+            .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail()));
     }
 
     @PostMapping("/signup")
@@ -65,8 +65,11 @@ public class AuthController {
         }
 
         // create new user's account
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
+        User user = new User(
+            signUpRequest.getUsername(), 
+            signUpRequest.getEmail(),
+            encoder.encode(signUpRequest.getPassword())
+        );
 
         userRepository.save(user);
 

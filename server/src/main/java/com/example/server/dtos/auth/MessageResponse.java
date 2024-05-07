@@ -1,4 +1,4 @@
-package com.example.server.dtos;
+package com.example.server.dtos.auth;
 
 public class MessageResponse {
     private String message;
