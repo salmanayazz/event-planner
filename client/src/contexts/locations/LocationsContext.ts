@@ -21,6 +21,11 @@ export interface LocationsContextType {
     address: string,
     photoUrl: string
   ) => Promise<void>;
+  castVote: (
+    groupId: number,
+    eventId: number,
+    locationId: number
+  ) => Promise<void>;
 }
 
 export const useLocations = () => {

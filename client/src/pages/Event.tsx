@@ -29,7 +29,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function EventPage() {
   const { groupId, eventId } = useParams();
-  const { locations, getLocations, createLocation } = useLocations();
+  const { locations, getLocations, createLocation, castVote } = useLocations();
   const { events, getEvents } = useEvents();
   const event = events?.find((event: Event) => event.id === Number(eventId));
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -129,7 +129,13 @@ export default function EventPage() {
               <Text mt={2}>{location.address}</Text>
               <Text mt={2}>{location.creator.username}</Text>
               <Flex justify="space-between" mt={4}>
-                <Button colorScheme="blue" mr={4}>
+                <Button
+                  colorScheme="blue"
+                  mr={4}
+                  onClick={() =>
+                    castVote(Number(groupId), Number(eventId), location.id)
+                  }
+                >
                   <Text>Vote</Text>
                 </Button>
                 <Box>

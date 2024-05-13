@@ -48,8 +48,12 @@ public class Group {
             '}';
     }
 
-    public List<User> getMembers() {
-        return members;
+    public List<User> getMembers() { return members; }
+
+    public List<User> getAllUsers() {
+        List<User> allUsers = new ArrayList<>(members);
+        allUsers.add(owner);
+        return allUsers;
     }
 
     public User getOwner() {

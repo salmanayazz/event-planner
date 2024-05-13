@@ -43,12 +43,28 @@ const LocationProvider: React.FC<LocationProviderProps> = ({ children }) => {
     }
   };
 
+  const castVote = async (
+    groupId: number,
+    eventId: number,
+    locationId: number
+  ) => {
+    try {
+      await axiosInstance.post(
+        `groups/${groupId}/events/${eventId}/locations/${locationId}/vote`
+      );
+      getLocations(groupId, eventId);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
   return (
     <LocationsContext.Provider
       value={{
         locations,
         getLocations,
         createLocation,
+        castVote,
       }}
     >
       {children}
