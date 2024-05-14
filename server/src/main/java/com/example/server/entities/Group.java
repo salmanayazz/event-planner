@@ -1,9 +1,10 @@
 package com.example.server.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "groups")
@@ -19,7 +20,7 @@ public class Group {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "group_members",
         joinColumns = @JoinColumn(name = "group_id"),
@@ -27,17 +28,14 @@ public class Group {
     )
     private List<User> members = new ArrayList<>();
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public void addMember(User user) {
-        this.members.add(user);
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "group_events",
+        joinColumns = @JoinColumn(name = "group_id"),
+        inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    @JsonIgnore
+    private List<Event> events = new ArrayList<>();
 
     public String toString() {
         return "Group{" +
@@ -48,12 +46,26 @@ public class Group {
             '}';
     }
 
-    public List<User> getMembers() { return members; }
+    public List<User> getMembers() { 
+        return members;
+    }
 
-    public List<User> getAllUsers() {
+    @JsonIgnore
+    public List<User> getMembersAndOwner() {
         List<User> allUsers = new ArrayList<>(members);
         allUsers.add(owner);
         return allUsers;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public Event getEvent(Long eventId) {
+        return events.stream()
+            .filter(e -> e.getId().equals(eventId))
+            .findFirst()
+            .orElse(null);
     }
 
     public User getOwner() {
@@ -75,5 +87,22 @@ public class Group {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public void addMember(User user) {
+        this.members.add(user);
+    }
+
+    public void addEvent(Event event) {
+        this.events.add(event);
+    }
+
 }
 

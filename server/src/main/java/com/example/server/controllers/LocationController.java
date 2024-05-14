@@ -56,12 +56,12 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or group does not exist");
         }
 
-        Event event = eventRepository.findEventInGroup(groupId, eventId);
+        Event event = group.getEvent(eventId);
         if (event == null) {
             return ResponseEntity.badRequest().body("Unauthorized or event does not exist");
         }
 
-        return ResponseEntity.ok().body(locationRepository.getLocationsInEvent(eventId));
+        return ResponseEntity.ok().body(event.getLocations());
     }
 
     @PostMapping
@@ -78,7 +78,7 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or group does not exist");
         }
 
-        Event event = eventRepository.findEventInGroup(groupId, eventId);
+        Event event = group.getEvent(eventId);
         if (event == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or event does not exist");
         }
@@ -87,10 +87,12 @@ public class LocationController {
                 body.name,
                 body.address,
                 body.photoUrl,
-                event,
                 userRepository.getReferenceById(userId)
         );
         locationRepository.save(location);
+        event.addLocation(location);
+        eventRepository.save(event);
+
         return ResponseEntity.ok().body("Location added successfully");
     }
 
@@ -103,14 +105,14 @@ public class LocationController {
             HttpServletRequest req
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
+
         Optional<Location> locationOptional = locationRepository.findById(locationId);
         if (locationOptional.isEmpty()) {
             return ResponseEntity.badRequest().body("Location does not exist");
         }
-
         Location location = locationOptional.get();
 
-        boolean userHasAccess = location.getEvent().getGroup().getAllUsers().stream()
+        boolean userHasAccess = groupRepository.getReferenceById(groupId).getMembersAndOwner().stream()
                 .anyMatch(user -> {
                     System.out.println(user.getId());
                     return user.getId().equals(userId);
@@ -121,19 +123,14 @@ public class LocationController {
         }
 
         // user can vote if they have not suggested a location or voted already
-        boolean userHasVoted = false;
-        for (Location loc: locationRepository.getLocationsInEvent(eventId)) {
+        Event event = eventRepository.getReferenceById(eventId);
+        for (Location loc: event.getLocations()) {
             if (loc.getVoters().stream().anyMatch(voter -> voter.getId().equals(userId))) {
-                userHasVoted = true;
-                break;
+                return ResponseEntity.badRequest().body("User has already voted");
             }
         }
 
-        if (userHasVoted) {
-            return ResponseEntity.badRequest().body("User has already voted");
-        }
-
-        Optional<Location> suggestedLocation = locationRepository.getLocationsInEvent(eventId).stream()
+        Optional<Location> suggestedLocation = event.getLocations().stream()
                 .filter(loc -> loc.getCreator().getId().equals(userId))
                 .findFirst();
 
@@ -146,5 +143,4 @@ public class LocationController {
 
         return ResponseEntity.ok().body("Vote casted successfully");
     }
-
 }

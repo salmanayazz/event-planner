@@ -2,6 +2,7 @@ package com.example.server.controllers;
 
 import com.example.server.dtos.event.CreateEventRequest;
 import com.example.server.entities.Event;
+import com.example.server.entities.Group;
 import com.example.server.repositories.EventRepository;
 import com.example.server.repositories.GroupRepository;
 import com.example.server.repositories.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -38,8 +40,8 @@ public class EventController {
         if (groupRepository.findJoined(userId, groupId) == null) {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
         }
-        
-        return ResponseEntity.ok().body(eventRepository.findEventsInGroup(groupId));
+
+        return ResponseEntity.ok().body(groupRepository.findById(groupId).get().getEvents());
     }
 
     @PostMapping
@@ -47,12 +49,17 @@ public class EventController {
     public ResponseEntity<?> createEvent(@PathVariable("groupId") Long groupId, @Valid @RequestBody CreateEventRequest body, HttpServletRequest req) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
 
-        if (groupRepository.findJoined(userId, groupId) == null) {
+        Optional<Group> groupOptional = groupRepository.findById(groupId);
+        if (groupOptional.isEmpty()) {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
         }
 
-        Event event = new Event(body.name, userId, groupId);
+        Event event = new Event(body.name, userRepository.getReferenceById(userId));
         eventRepository.save(event);
+
+        Group group = groupOptional.get();
+        group.addEvent(event);
+        groupRepository.save(group);
 
         return ResponseEntity.ok().body("Event created successfully");
     }

@@ -59,15 +59,12 @@ public class GroupController {
 
     @PostMapping("/{groupId}/users")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> addUser(@PathVariable("groupId") String groupIdString, @Valid @RequestBody AddUserRequest req, HttpServletRequest request) {
+    public ResponseEntity<?> addUser(
+            @PathVariable("groupId") Long groupId,
+            @Valid @RequestBody AddUserRequest req,
+            HttpServletRequest request
+    ) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
-
-        Long groupId = null;
-        try {
-            groupId = Long.parseLong(groupIdString);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid group ID");
-        }
 
         Group group = groupRepository.findJoined(userId, groupId);
         if (group == null) {
@@ -90,16 +87,11 @@ public class GroupController {
 
     @DeleteMapping("/{groupId}/users/{userId}")
     @PreAuthorize("hasRole('USER')")
-    ResponseEntity<?> removeUser(@PathVariable("groupId") String groupIdString, @PathVariable("userId") String userIdToRemoveString, HttpServletRequest request) {
-        Long groupId = null;
-        Long userIdToRemove = null;
-        try {
-            groupId = Long.parseLong(groupIdString);
-            userIdToRemove = Long.parseLong(userIdToRemoveString);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid group or user ID");
-        }
-
+    ResponseEntity<?> removeUser(
+            @PathVariable("groupId") Long groupId,
+            @PathVariable("userId") Long userIdToRemove,
+            HttpServletRequest request
+    ) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
         Group group = groupRepository.findOwned(userId, groupId);
         if (group == null) {

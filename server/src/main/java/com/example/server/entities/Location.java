@@ -29,12 +29,7 @@ public class Location {
     @NotNull
     private User creator;
 
-    @ManyToOne
-    @JoinColumn(name = "event_id")
-    @NotNull
-    private Event event;
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "location_voters",
         joinColumns = @JoinColumn(name = "location_id"),
@@ -43,11 +38,10 @@ public class Location {
     private List<User> voters = new ArrayList<>();
 
     public Location() {}
-    public Location(String name, String address, String photoUrl, Event event, User creator) {
+    public Location(String name, String address, String photoUrl, User creator) {
         this.name = name;
         this.address = address;
         this.photoUrl = photoUrl;
-        this.event = event;
         this.creator = creator;
     }
 
@@ -68,10 +62,6 @@ public class Location {
 
     public User getCreator() {
         return creator;
-    }
-
-    public Event getEvent() {
-        return event;
     }
 
     public List<User> getVoters() {

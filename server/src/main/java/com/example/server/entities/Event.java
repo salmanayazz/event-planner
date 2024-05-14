@@ -1,8 +1,11 @@
 package com.example.server.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -15,21 +18,22 @@ public class Event {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
-    @NotNull
-    private Group group;
-
-    @ManyToOne
     @JoinColumn(name = "creator_id")
     @NotNull
     private User creator;
 
-    public Event(String name, Long creatorId, Long groupId) {
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "event_locations",
+        joinColumns = @JoinColumn(name = "event_id"),
+        inverseJoinColumns = @JoinColumn(name = "location_id")
+    )
+    @JsonIgnore
+    private List<Location> locations = new ArrayList<>();
+
+    public Event(String name, User creator) {
         this.name = name;
-        this.creator = new User();
-        this.creator.setId(creatorId);
-        this.group = new Group();
-        this.group.setId(groupId);
+        this.creator = creator;
     }
 
     public Event() {}
@@ -46,7 +50,11 @@ public class Event {
         return creator;
     }
 
-    public Group getGroup() {
-        return group;
+    public List<Location> getLocations() {
+        return locations;
+    }
+
+    public void addLocation(Location location) {
+        locations.add(location);
     }
 }
