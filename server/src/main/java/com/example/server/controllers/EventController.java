@@ -54,10 +54,10 @@ public class EventController {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
         }
 
-        Event event = new Event(body.name, userRepository.getReferenceById(userId));
+        Group group = groupOptional.get();
+        Event event = new Event(body.name, userRepository.getReferenceById(userId), group);
         eventRepository.save(event);
 
-        Group group = groupOptional.get();
         group.addEvent(event);
         groupRepository.save(group);
 

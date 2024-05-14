@@ -17,26 +17,26 @@ public class Event {
     @Size(max = 20)
     private String name;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    @JsonIgnore
+    private Group group;
+
     @ManyToOne
     @JoinColumn(name = "creator_id")
     @NotNull
     private User creator;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "event_locations",
-        joinColumns = @JoinColumn(name = "event_id"),
-        inverseJoinColumns = @JoinColumn(name = "location_id")
-    )
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Location> locations = new ArrayList<>();
 
-    public Event(String name, User creator) {
+    public Event() {}
+    public Event(String name, User creator, Group group) {
         this.name = name;
         this.creator = creator;
+        this.group = group;
     }
-
-    public Event() {}
 
     public Long getId() {
         return id;
@@ -44,6 +44,10 @@ public class Event {
 
     public String getName() {
         return name;
+    }
+
+    public Group getGroup() {
+        return group;
     }
 
     public User getCreator() {

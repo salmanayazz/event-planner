@@ -87,7 +87,8 @@ public class LocationController {
                 body.name,
                 body.address,
                 body.photoUrl,
-                userRepository.getReferenceById(userId)
+                userRepository.getReferenceById(userId),
+                event
         );
         locationRepository.save(location);
         event.addLocation(location);

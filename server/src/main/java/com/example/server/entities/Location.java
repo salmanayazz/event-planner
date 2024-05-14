@@ -1,5 +1,6 @@
 package com.example.server.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,6 +25,11 @@ public class Location {
     @Column(length = 500)
     private String photoUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id")
+    @JsonIgnore
+    private Event event;
+
     @ManyToOne
     @JoinColumn(name = "creator_id")
     @NotNull
@@ -38,11 +44,12 @@ public class Location {
     private List<User> voters = new ArrayList<>();
 
     public Location() {}
-    public Location(String name, String address, String photoUrl, User creator) {
+    public Location(String name, String address, String photoUrl, User creator, Event event) {
         this.name = name;
         this.address = address;
         this.photoUrl = photoUrl;
         this.creator = creator;
+        this.event = event;
     }
 
     public Long getId() {
