@@ -16,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -27,6 +30,8 @@ public class LocationController {
     GroupRepository groupRepository;
     UserRepository userRepository;
     JwtUtils jwtUtils;
+
+    private final Map<Long, Object> userLocks = new ConcurrentHashMap<>();
 
     @Autowired
     public LocationController(
@@ -107,41 +112,50 @@ public class LocationController {
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
 
-        Optional<Location> locationOptional = locationRepository.findById(locationId);
-        if (locationOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body("Location does not exist");
-        }
-        Location location = locationOptional.get();
+        userLocks.putIfAbsent(userId, new Object());
+        Object userLock = userLocks.get(userId);
 
-        boolean userHasAccess = groupRepository.getReferenceById(groupId).getMembersAndOwner().stream()
-                .anyMatch(user -> {
-                    System.out.println(user.getId());
-                    return user.getId().equals(userId);
-                });
+        synchronized (userLock) {
+            try {
+                Optional<Location> locationOptional = locationRepository.findById(locationId);
+                if (locationOptional.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Location does not exist");
+                }
+                Location location = locationOptional.get();
 
-        if (!userHasAccess) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User does not have access to group");
-        }
+                boolean userHasAccess = groupRepository.getReferenceById(groupId).getMembersAndOwner().stream()
+                        .anyMatch(user -> {
+                            System.out.println(user.getId());
+                            return user.getId().equals(userId);
+                        });
 
-        // user can vote if they have not suggested a location or voted already
-        Event event = eventRepository.getReferenceById(eventId);
-        for (Location loc: event.getLocations()) {
-            if (loc.getVoters().stream().anyMatch(voter -> voter.getId().equals(userId))) {
-                return ResponseEntity.badRequest().body("User has already voted");
+                if (!userHasAccess) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User does not have access to group");
+                }
+
+                // user can vote if they have not suggested a location or voted already
+                Event event = eventRepository.getReferenceById(eventId);
+                for (Location loc : event.getLocations()) {
+                    if (loc.getVoters().stream().anyMatch(voter -> voter.getId().equals(userId))) {
+                        return ResponseEntity.badRequest().body("User has already voted");
+                    }
+                }
+
+                Optional<Location> suggestedLocation = event.getLocations().stream()
+                        .filter(loc -> loc.getCreator().getId().equals(userId))
+                        .findFirst();
+
+                if (suggestedLocation.isPresent()) {
+                    return ResponseEntity.badRequest().body("User has already suggested a location");
+                }
+
+                location.getVoters().add(userRepository.getReferenceById(userId));
+                locationRepository.save(location);
+
+                return ResponseEntity.ok().body("Vote casted successfully");
+            } finally {
+                userLocks.remove(userId);
             }
         }
-
-        Optional<Location> suggestedLocation = event.getLocations().stream()
-                .filter(loc -> loc.getCreator().getId().equals(userId))
-                .findFirst();
-
-        if (suggestedLocation.isPresent()) {
-            return ResponseEntity.badRequest().body("User has already suggested a location");
-        }
-
-        location.getVoters().add(userRepository.getReferenceById(userId));
-        locationRepository.save(location);
-
-        return ResponseEntity.ok().body("Vote casted successfully");
     }
 }
