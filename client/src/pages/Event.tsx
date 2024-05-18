@@ -1,40 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Button,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  Input,
-  VStack,
-  Text,
-} from "@chakra-ui/react";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  StandaloneSearchBox,
-} from "@react-google-maps/api";
+import { Button, useDisclosure, VStack, Text } from "@chakra-ui/react";
 import { User, useAuth } from "../contexts/auth/AuthContext";
 import { useEvents, Event } from "../contexts/events/EventsContext";
 import { useLocations, Location } from "../contexts/locations/LocationsContext";
 import LocationCard from "../components/LocationCard";
+import LocationSelector from "../components/LocationSelector";
 
 export default function EventPage() {
   const { user } = useAuth();
   const { groupId, eventId } = useParams();
-  const { locations, getLocations, createLocation } = useLocations();
+  const { locations, getLocations } = useLocations();
   const { events, getEvents } = useEvents();
 
   const event = events?.find((event: Event) => event.id === Number(eventId));
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult>();
-  const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox | null>();
 
   useEffect(() => {
     getEvents(Number(groupId));
@@ -49,61 +29,6 @@ export default function EventPage() {
     (location) => location.creator.id === user?.id
   );
 
-  useEffect(() => {
-    // force the pac-container z-index to be above the modal
-    const style = document.createElement("style");
-    style.innerHTML = ".pac-container { z-index: 10000 !important; }";
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
-  const handleCreateLocation = async () => {
-    if (selectedPlace) {
-      const locationName = selectedPlace.name;
-      const address = selectedPlace.formatted_address;
-      const placeId = selectedPlace.place_id;
-
-      if (locationName && address && placeId) {
-        const placesService = new google.maps.places.PlacesService(
-          document.createElement("div")
-        );
-
-        placesService.getDetails(
-          {
-            placeId,
-            fields: ["photo"],
-          },
-          (placeResult, status) => {
-            if (
-              status === google.maps.places.PlacesServiceStatus.OK &&
-              placeResult
-            ) {
-              createLocation(
-                Number(groupId),
-                Number(eventId),
-                locationName,
-                address,
-                placeResult.photos?.[0].getUrl() || ""
-              );
-            }
-          }
-        );
-      }
-      onClose();
-    }
-  };
-
-  const onPlacesChanged = () => {
-    if (searchBox) {
-      const places = searchBox.getPlaces();
-      if (places && places.length > 0) {
-        setSelectedPlace(places[0]);
-      }
-    }
-  };
-
   return (
     <>
       <Text fontSize="xl" fontWeight="bold" mb={4}>
@@ -112,6 +37,7 @@ export default function EventPage() {
       <Text fontSize="lg" fontWeight="bold" mb={4}>
         Locations
       </Text>
+
       <VStack spacing={4} align="stretch">
         {locations?.map((location) => (
           <LocationCard
@@ -131,57 +57,12 @@ export default function EventPage() {
         </Button>
       )}
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Select a Location</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <LoadScript
-              googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-              libraries={["places"]}
-            >
-              <StandaloneSearchBox
-                onLoad={(ref: google.maps.places.SearchBox) =>
-                  setSearchBox(ref)
-                }
-                onPlacesChanged={onPlacesChanged}
-              >
-                <Input id="search-input" placeholder="Search for a place" />
-              </StandaloneSearchBox>
-              <GoogleMap
-                center={
-                  selectedPlace
-                    ? {
-                        lat: selectedPlace.geometry?.location?.lat() || 0,
-                        lng: selectedPlace.geometry?.location?.lng() || 0,
-                      }
-                    : { lat: 0, lng: 0 }
-                }
-                zoom={15}
-                mapContainerStyle={{ height: "400px", width: "100%" }}
-              >
-                {selectedPlace && (
-                  <Marker
-                    position={{
-                      lat: selectedPlace.geometry?.location?.lat() || 0,
-                      lng: selectedPlace.geometry?.location?.lng() || 0,
-                    }}
-                  />
-                )}
-              </GoogleMap>
-            </LoadScript>
-            <Button
-              colorScheme="green"
-              onClick={handleCreateLocation}
-              mt={4}
-              width="100%"
-            >
-              Confirm Location
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <LocationSelector
+        groupId={Number(groupId)}
+        eventId={Number(eventId)}
+        onClose={onClose}
+        isOpen={isOpen}
+      />
     </>
   );
 }
