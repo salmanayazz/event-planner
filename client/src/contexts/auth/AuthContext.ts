@@ -6,30 +6,15 @@ export interface User {
   email: string;
 }
 
-export interface AuthState {
-  user: User | undefined;
-  loading: boolean;
-}
-
-export interface AuthError {
-  username?: string;
-  email?: string;
-  password?: string;
-  other?: string;
-}
-
 export interface AuthContextType {
-  authState: AuthState;
-  signupUser: (userData: {
-    username: string;
-    email: string;
-    password: string;
-  }) => Promise<AuthError | undefined>;
-  loginUser: (userData: {
-    username: string;
-    email: string;
-    password: string;
-  }) => Promise<AuthError | undefined>;
+  user: User | undefined;
+  signupUser: (
+    username: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
+  loginUser: (email: string, password: string) => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
 export const useAuth = () => {

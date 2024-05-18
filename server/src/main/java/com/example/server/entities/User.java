@@ -7,11 +7,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table( name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "username"),
-                @UniqueConstraint(columnNames = "email")
-        })
+@Table(
+  name = "users",
+  uniqueConstraints = {
+    @UniqueConstraint(columnNames = "username"),
+    @UniqueConstraint(columnNames = "email")
+  }
+)
 public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,8 +33,7 @@ public class User {
   @JsonIgnore
   private String password;
 
-  public User() {
-  }
+  public User() {}
 
   public User(String username, String email, String password) {
     this.username = username;
@@ -40,12 +41,23 @@ public class User {
     this.password = password;
   }
 
-  public Long getId() { return id; }
-  public String getEmail() { return email; }
-  public String getPassword() { return password; }
-  public String getUsername() { return username; }
+  public Long getId() {
+    return id; 
+  }
+  
+  public String getEmail() { 
+    return email;
+  }
 
-    public void setId(Long id) {
-      this.id = id;
-    }
+  public String getPassword() { 
+    return password;
+  }
+
+  public String getUsername() { 
+    return username;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 }

@@ -31,17 +31,9 @@ export default function Auth() {
 
   const handleSubmit = async () => {
     if (isLoginMode) {
-      await loginUser({
-        username: username,
-        email: email,
-        password: password,
-      });
+      await loginUser(email, password);
     } else {
-      await signupUser({
-        username: username,
-        email: email,
-        password: password,
-      });
+      await signupUser(username, email, password);
     }
   };
 

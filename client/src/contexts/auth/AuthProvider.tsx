@@ -1,5 +1,5 @@
-import React, { ReactNode, useState } from "react";
-import { AuthContext, AuthState, AuthError } from "./AuthContext";
+import React, { ReactNode, useState, useEffect } from "react";
+import { AuthContext, User } from "./AuthContext";
 import { axiosInstance } from "../AxiosInstance";
 
 interface AuthProviderProps {
@@ -7,60 +7,70 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: undefined,
-    loading: false,
-  });
+  const [user, setUser] = useState<User | undefined>();
 
-  async function signupUser(userData: {
-    username: string;
-    password: string;
-  }): Promise<AuthError | undefined> {
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const signupUser = async (
+    username: string,
+    email: string,
+    password: string
+  ) => {
     try {
-      setAuthState({ ...authState, loading: true });
-      await axiosInstance.post(`auth/signup`, userData);
-      //getUser();
+      await axiosInstance.post(`auth/signup`, {
+        username,
+        email,
+        password,
+      });
+      loginUser(email, password);
     } catch (error: unknown) {
       console.log(error);
-      setAuthState({
-        ...authState,
-        loading: false,
-      });
-      //return error?.response?.data || { other: error.message };
     }
     return;
-  }
+  };
 
-  const loginUser = async (userData: {
-    username: string;
-    email: string;
-    password: string;
-  }): Promise<AuthError | undefined> => {
+  const loginUser = async (email: string, password: string) => {
     try {
-      setAuthState({ ...authState, loading: true });
-      const response = await axiosInstance.post(`auth/signin`, userData);
+      const response = await axiosInstance.post(`auth/signin`, {
+        email,
+        password,
+      });
 
       // store accessToken in local storage so it can be used by the axios instance
       const { accessToken } = response.data;
       localStorage.setItem("accessToken", accessToken);
-      setAuthState({ ...authState, user: response.data.user, loading: false });
+      console.log(response.data);
+
+      setUser({
+        id: response.data.id,
+        username: response.data.username,
+        email: response.data.email,
+      });
+      console.log(user);
     } catch (error: unknown) {
       console.log(error);
-      setAuthState({
-        ...authState,
-        loading: false,
-      });
-      //return error?.response?.data || { other: error?.message };
     }
     return;
+  };
+
+  const checkAuth = async () => {
+    try {
+      const response = await axiosInstance.get(`auth/signin`);
+      setUser(response.data);
+    } catch (error: unknown) {
+      console.log(error);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        authState,
+        user,
         signupUser,
         loginUser,
+        checkAuth,
       }}
     >
       {children}
