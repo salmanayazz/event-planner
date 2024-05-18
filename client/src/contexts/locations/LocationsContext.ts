@@ -26,6 +26,11 @@ export interface LocationsContextType {
     eventId: number,
     locationId: number
   ) => Promise<void>;
+  deleteVote: (
+    groupId: number,
+    eventId: number,
+    locationId: number
+  ) => Promise<void>;
 }
 
 export const useLocations = () => {

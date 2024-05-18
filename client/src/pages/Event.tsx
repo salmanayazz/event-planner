@@ -11,10 +11,7 @@ import {
   useDisclosure,
   Input,
   VStack,
-  Box,
-  Image,
   Text,
-  Flex,
 } from "@chakra-ui/react";
 import {
   GoogleMap,
@@ -22,26 +19,35 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
+import { User, useAuth } from "../contexts/auth/AuthContext";
 import { useEvents, Event } from "../contexts/events/EventsContext";
-import { Location } from "../contexts/locations/LocationsContext";
-import { useLocations } from "../contexts/locations/LocationsContext";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { useLocations, Location } from "../contexts/locations/LocationsContext";
+import LocationCard from "../components/LocationCard";
 
 export default function EventPage() {
+  const { user } = useAuth();
   const { groupId, eventId } = useParams();
-  const { locations, getLocations, createLocation, castVote } = useLocations();
+  const { locations, getLocations, createLocation } = useLocations();
   const { events, getEvents } = useEvents();
+
   const event = events?.find((event: Event) => event.id === Number(eventId));
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedPlace, setSelectedPlace] =
-    useState<google.maps.places.PlaceResult>();
-  const [searchBox, setSearchBox] =
-    useState<google.maps.places.SearchBox | null>();
+
+  const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult>();
+  const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox | null>();
 
   useEffect(() => {
     getEvents(Number(groupId));
     getLocations(Number(groupId), Number(eventId));
   }, [groupId, eventId]);
+
+  const votedLocation: Location | undefined = locations?.find((location) =>
+    location.voters.some((voter: User) => voter.id === user?.id)
+  );
+
+  const suggestedLocation: Location | undefined = locations?.find(
+    (location) => location.creator.id === user?.id
+  );
 
   useEffect(() => {
     // force the pac-container z-index to be above the modal
@@ -103,55 +109,27 @@ export default function EventPage() {
       <Text fontSize="xl" fontWeight="bold" mb={4}>
         {event?.name}
       </Text>
-
       <Text fontSize="lg" fontWeight="bold" mb={4}>
         Locations
       </Text>
-
       <VStack spacing={4} align="stretch">
-        {locations?.map((location: Location) => (
-          <Box m={4} borderRadius="md" boxShadow="xl" key={location.id}>
-            <Image
-              src={location.photoUrl}
-              alt={location.name}
-              objectFit="cover"
-              width="100%"
-              height="200px"
-              borderTopRadius="md"
-            />
-            <Box key={location.id} p={4} bg="gray.100">
-              <Flex align="center">
-                <FaMapMarkerAlt size={24} color="blue.500" />
-                <Text ml={2} fontWeight="bold" fontSize="l">
-                  {location.name}
-                </Text>
-              </Flex>
-              <Text mt={2}>{location.address}</Text>
-              <Text mt={2}>{location.creator.username}</Text>
-              <Flex justify="space-between" mt={4}>
-                <Button
-                  colorScheme="blue"
-                  mr={4}
-                  onClick={() =>
-                    castVote(Number(groupId), Number(eventId), location.id)
-                  }
-                >
-                  <Text>Vote</Text>
-                </Button>
-                <Box>
-                  {location.voters.map((voter) => (
-                    <Text key={voter.id}>{voter.username}</Text>
-                  ))}
-                </Box>
-              </Flex>
-            </Box>
-          </Box>
+        {locations?.map((location) => (
+          <LocationCard
+            key={location.id}
+            location={location}
+            votedLocation={votedLocation}
+            suggestedLocation={suggestedLocation}
+            groupId={Number(groupId)}
+            eventId={Number(eventId)}
+          />
         ))}
       </VStack>
 
-      <Button colorScheme="green" onClick={onOpen} mt={4}>
-        Add a Location
-      </Button>
+      {!suggestedLocation && (
+        <Button colorScheme="green" onClick={onOpen} mt={4}>
+          Add a Location
+        </Button>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

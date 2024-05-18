@@ -4,6 +4,7 @@ import com.example.server.dtos.location.CreateLocationRequest;
 import com.example.server.entities.Event;
 import com.example.server.entities.Group;
 import com.example.server.entities.Location;
+import com.example.server.entities.User;
 import com.example.server.repositories.EventRepository;
 import com.example.server.repositories.GroupRepository;
 import com.example.server.repositories.LocationRepository;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,6 +88,12 @@ public class LocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or event does not exist");
         }
 
+        for (Location loc : event.getLocations()) {
+            if (loc.getVoters().stream().anyMatch(voter -> voter.getId().equals(userId))) {
+                return ResponseEntity.badRequest().body("User has already voted");
+            }
+        }
+
         Location location = new Location(
                 body.name,
                 body.address,
@@ -102,7 +108,7 @@ public class LocationController {
         return ResponseEntity.ok().body("Location added successfully");
     }
 
-    @PostMapping("/{locationId}/vote")
+    @PostMapping("/{locationId}/votes")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> castVote(
             @PathVariable("groupId") Long groupId,
@@ -157,5 +163,40 @@ public class LocationController {
                 userLocks.remove(userId);
             }
         }
+    }
+
+    @DeleteMapping("/{locationId}/votes")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> deleteVote(
+            @PathVariable("groupId") Long groupId,
+            @PathVariable("eventId") Long eventId,
+            @PathVariable("locationId") Long locationId,
+            HttpServletRequest req
+
+    ) {
+        Optional<User> userOptional = userRepository.findById(jwtUtils.getUserIdFromRequest(req));
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+        }
+        User user = userOptional.get();
+
+        Group group = groupRepository.findJoined(user.getId(), groupId);
+        if (group == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or group does not exist");
+        }
+
+        Event event = group.getEvent(eventId);
+        if (event == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or event does not exist");
+        }
+
+        for (Location loc : event.getLocations()) {
+            if (loc.getVoters().stream().anyMatch(voter -> voter.getId().equals(user.getId()))) {
+                loc.deleteVoter(user);
+                locationRepository.save(loc);
+            }
+        }
+
+        return ResponseEntity.ok("Successfully deleted vote");
     }
 }

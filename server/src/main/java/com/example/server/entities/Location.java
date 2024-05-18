@@ -74,4 +74,8 @@ public class Location {
     public List<User> getVoters() {
         return voters;
     }
+
+    public void deleteVoter(User user) {
+        voters.remove(user);
+    }
 }

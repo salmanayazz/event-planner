@@ -50,7 +50,22 @@ const LocationProvider: React.FC<LocationProviderProps> = ({ children }) => {
   ) => {
     try {
       await axiosInstance.post(
-        `groups/${groupId}/events/${eventId}/locations/${locationId}/vote`
+        `groups/${groupId}/events/${eventId}/locations/${locationId}/votes`
+      );
+      getLocations(groupId, eventId);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
+  const deleteVote = async (
+    groupId: number,
+    eventId: number,
+    locationId: number
+  ) => {
+    try {
+      await axiosInstance.delete(
+        `groups/${groupId}/events/${eventId}/locations/${locationId}/votes`
       );
       getLocations(groupId, eventId);
     } catch (error: unknown) {
@@ -65,6 +80,7 @@ const LocationProvider: React.FC<LocationProviderProps> = ({ children }) => {
         getLocations,
         createLocation,
         castVote,
+        deleteVote,
       }}
     >
       {children}
