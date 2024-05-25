@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Box, Button, Input, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Input, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
-import { NavLink } from "react-router-dom";
 import Header from "../components/Header";
 import { FiPlus } from "react-icons/fi";
 import GroupCards from "../components/GroupCards";

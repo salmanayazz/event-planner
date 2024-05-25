@@ -1,7 +1,5 @@
-import React from "react";
 import { Grid, HStack, Text, VStack, Box, Divider } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
-import { FaCalendar, FaUser } from "react-icons/fa"; // Importing user icon from react-icons
 import { Group } from "../contexts/groups/GroupsContext";
 import { FiCalendar, FiUser } from "react-icons/fi";
 import { GROUP_LINK } from "../App";

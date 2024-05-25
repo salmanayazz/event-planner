@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Flex,
@@ -8,7 +8,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { IconType } from "react-icons";
-import { FaBars } from "react-icons/fa";
+import { FiMenu } from "react-icons/fi";
 
 interface SidebarProps {
   items: {
@@ -54,7 +54,7 @@ export default function Sidebar({ items }: SidebarProps) {
         <Flex direction="column" alignItems="flex-start" p={4}>
           <IconButton
             aria-label="Toggle Sidebar"
-            icon={<FaBars />}
+            icon={<FiMenu />}
             onClick={handleToggle}
             mb={4}
             variant="outline"
