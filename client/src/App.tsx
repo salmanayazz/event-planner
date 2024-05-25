@@ -34,19 +34,23 @@ function App() {
   );
 }
 
-export const HOME = () => {
+export const HOME_LINK = () => {
   return "/";
 };
-export const AUTH = () => {
+
+export const AUTH_LINK = () => {
   return "/auth";
 };
-export const GROUPS = () => {
+
+export const GROUPS_LINK = () => {
   return "/groups";
 };
-export const GROUP = (groupId: number) => {
+
+export const GROUP_LINK = (groupId: number) => {
   return `/groups/${groupId}`;
 };
-export const EVENT = (groupId: number, eventId: number) => {
+
+export const EVENT_LINK = (groupId: number, eventId: number) => {
   return `/groups/${groupId}/events/${eventId}`;
 };
 

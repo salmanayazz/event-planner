@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { FaCalendar, FaUser } from "react-icons/fa"; // Importing user icon from react-icons
 import { Group } from "../contexts/groups/GroupsContext";
 import { FiCalendar, FiUser } from "react-icons/fi";
+import { GROUP_LINK } from "../App";
 
 interface GroupCardProps {
   groups: Group[];
@@ -22,7 +23,7 @@ export default function GroupCards({ groups }: GroupCardProps) {
       justifyContent="center"
     >
       {groups.map((group) => (
-        <NavLink key={group.id} to={`/groups/${group.id}`}>
+        <NavLink key={group.id} to={GROUP_LINK(group.id)}>
           <VStack
             bg="pri.200"
             p={4}

@@ -3,7 +3,7 @@ import { useGroups } from "../contexts/groups/GroupsContext";
 import { useEvents } from "../contexts/events/EventsContext";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { EVENT } from "../App";
+import { EVENT_LINK } from "../App";
 import { NavLink } from "react-router-dom";
 import Header from "../components/Header";
 import { FiCalendar, FiPlus, FiUsers } from "react-icons/fi";
@@ -93,7 +93,7 @@ export default function Group() {
 
         <h2>Events:</h2>
         {events?.map((event) => (
-          <NavLink to={EVENT(groupId, event.id)}>
+          <NavLink to={EVENT_LINK(groupId, event.id)}>
             <h3 key={event.id}>{event.name}</h3>
           </NavLink>
         ))}
