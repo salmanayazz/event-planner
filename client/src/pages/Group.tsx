@@ -3,7 +3,7 @@ import { useGroups } from "../contexts/groups/GroupsContext";
 import { useEvents } from "../contexts/events/EventsContext";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { EVENT_LINK } from "../App";
+import { EVENT_LINK } from "../links";
 import { NavLink } from "react-router-dom";
 import Header from "../components/Header";
 import { FiCalendar, FiPlus, FiUsers } from "react-icons/fi";

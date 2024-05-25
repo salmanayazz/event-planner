@@ -2,7 +2,7 @@ import { Grid, HStack, Text, VStack, Box, Divider } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Group } from "../contexts/groups/GroupsContext";
 import { FiCalendar, FiUser } from "react-icons/fi";
-import { GROUP_LINK } from "../App";
+import { GROUP_LINK } from "../links";
 
 interface GroupCardProps {
   groups: Group[];
