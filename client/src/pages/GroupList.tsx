@@ -4,6 +4,7 @@ import { useGroups } from "../contexts/groups/GroupsContext";
 import { NavLink } from "react-router-dom";
 import Header from "../components/Header";
 import { FiPlus } from "react-icons/fi";
+import GroupCards from "../components/GroupCards";
 
 export default function Groups() {
   const { groups, createGroup } = useGroups();
@@ -40,13 +41,7 @@ export default function Groups() {
         buttonIcon={FiPlus}
       />
 
-      <VStack spacing={4} align="start">
-        {groups.map((group) => (
-          <NavLink key={group.id} to={`/groups/${group.id}`}>
-            <Text>{group.name}</Text>
-          </NavLink>
-        ))}
-      </VStack>
+      <GroupCards groups={groups} />
 
       {!showCreateGroup ? (
         <Button colorScheme="blue" mt={4} onClick={handleCreateGroup}>
