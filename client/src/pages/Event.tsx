@@ -6,6 +6,8 @@ import { useEvents, Event } from "../contexts/events/EventsContext";
 import { useLocations, Location } from "../contexts/locations/LocationsContext";
 import LocationCard from "../components/LocationCard";
 import LocationSelector from "../components/LocationSelector";
+import Header from "../components/Header";
+import { FiPlus } from "react-icons/fi";
 
 export default function EventPage() {
   const { user } = useAuth();
@@ -31,9 +33,13 @@ export default function EventPage() {
 
   return (
     <>
-      <Text fontSize="xl" fontWeight="bold" mb={4}>
-        {event?.name}
-      </Text>
+      <Header
+        title={event?.name || ""}
+        onButtonClick={onOpen}
+        buttonLabel="Suggest Location"
+        buttonIcon={FiPlus}
+      />
+
       <Text fontSize="lg" fontWeight="bold" mb={4}>
         Locations
       </Text>

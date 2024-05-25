@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Box, Button, Input, Text, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import { NavLink } from "react-router-dom";
+import Header from "../components/Header";
+import { FiPlus } from "react-icons/fi";
 
 export default function Groups() {
   const { groups, createGroup } = useGroups();
@@ -30,10 +32,13 @@ export default function Groups() {
   };
 
   return (
-    <Box p={4}>
-      <Text fontSize="xl" fontWeight="bold" mb={4}>
-        My Groups
-      </Text>
+    <Box>
+      <Header
+        title="Groups"
+        onButtonClick={handleCreateGroup}
+        buttonLabel="Create Group"
+        buttonIcon={FiPlus}
+      />
 
       <VStack spacing={4} align="start">
         {groups.map((group) => (

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { EVENT } from "../App";
 import { NavLink } from "react-router-dom";
+import Header from "../components/Header";
+import { FiPlus } from "react-icons/fi";
 
 export default function Group() {
   const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();
@@ -14,14 +16,44 @@ export default function Group() {
 
   const [newUser, setNewUser] = useState("");
   const [newEvent, setNewEvent] = useState("");
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
 
   useEffect(() => {
     getEvents(groupId);
   }, [groupId]);
 
+  const toggleEventInput = () => {
+    setShowCreateEvent(!showCreateEvent);
+  };
+
   return (
-    <VStack spacing={4} align="start" mt={4}>
-      <h1>{group?.name}</h1>
+    <VStack spacing={4} align="start">
+      <Header
+        title={group?.name || ""}
+        onButtonClick={toggleEventInput}
+        buttonLabel="Create Event"
+        buttonIcon={FiPlus}
+      />
+
+      {showCreateEvent && (
+        <>
+          <Input
+            placeholder="Enter event name"
+            value={newEvent}
+            onChange={(event) => setNewEvent(event.target.value)}
+          />
+          <Button
+            colorScheme="green"
+            onClick={() => {
+              createEvent(groupId, newEvent);
+              toggleEventInput();
+            }}
+          >
+            Confirm
+          </Button>
+        </>
+      )}
+
       <h2>Members:</h2>
       <h3>{group?.owner.username}</h3>
       {group?.members.map((user) => (
@@ -52,16 +84,6 @@ export default function Group() {
           <h3 key={event.id}>{event.name}</h3>
         </NavLink>
       ))}
-
-      <h2>Create an Event:</h2>
-      <Input
-        placeholder="Enter event name"
-        value={newEvent}
-        onChange={(event) => setNewEvent(event.target.value)}
-      />
-      <Button onClick={() => createEvent(groupId, newEvent)}>
-        Create Event
-      </Button>
     </VStack>
   );
 }
