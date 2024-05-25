@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({
       width="100%"
       bg="pri.200"
       height={`calc(5rem * ${scrollMultiplier})`}
-      zIndex="sticky"
+      zIndex="1"
     >
       <Flex align="center" justify="space-between" height="100%" paddingX={4}>
         <Heading

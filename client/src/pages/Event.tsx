@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, useDisclosure, VStack, Text } from "@chakra-ui/react";
+import { Button, useDisclosure, VStack, Text, Flex } from "@chakra-ui/react";
 import { User, useAuth } from "../contexts/auth/AuthContext";
 import { useEvents, Event } from "../contexts/events/EventsContext";
 import { useLocations, Location } from "../contexts/locations/LocationsContext";
@@ -32,7 +32,7 @@ export default function EventPage() {
   );
 
   return (
-    <>
+    <Flex direction="row" p={4}>
       <Header
         title={event?.name || ""}
         onButtonClick={onOpen}
@@ -69,6 +69,6 @@ export default function EventPage() {
         onClose={onClose}
         isOpen={isOpen}
       />
-    </>
+    </Flex>
   );
 }
