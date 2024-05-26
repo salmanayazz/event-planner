@@ -8,6 +8,7 @@ import Event from "./pages/Event";
 import GroupsProvider from "./contexts/groups/GroupsProvider";
 import EventsProvider from "./contexts/events/EventsProvider";
 import LocationsProvider from "./contexts/locations/LocationsProvider";
+import "./App.css";
 
 function App() {
   return (
