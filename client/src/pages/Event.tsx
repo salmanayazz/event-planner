@@ -32,7 +32,7 @@ export default function EventPage() {
   );
 
   return (
-    <Flex direction="row" p={4}>
+    <VStack spacing="0" width="100%" bg="pri.100">
       <Header
         title={event?.name || ""}
         onButtonClick={onOpen}
@@ -40,11 +40,7 @@ export default function EventPage() {
         buttonIcon={FiPlus}
       />
 
-      <Text fontSize="lg" fontWeight="bold" mb={4}>
-        Locations
-      </Text>
-
-      <VStack spacing={4} align="stretch">
+      <VStack spacing="0" width="100%" padding="1rem">
         {locations?.map((location) => (
           <LocationCard
             key={location.id}
@@ -69,6 +65,6 @@ export default function EventPage() {
         onClose={onClose}
         isOpen={isOpen}
       />
-    </Flex>
+    </VStack>
   );
 }

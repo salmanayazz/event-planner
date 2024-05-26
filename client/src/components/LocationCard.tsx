@@ -1,6 +1,14 @@
-import { Box, Image, Text, Flex, Button } from "@chakra-ui/react";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import {
+  Box,
+  Image,
+  Text,
+  Flex,
+  Button,
+  VStack,
+  HStack,
+} from "@chakra-ui/react";
 import { Location, useLocations } from "../contexts/locations/LocationsContext";
+import { FiMapPin } from "react-icons/fi";
 
 interface LocationCardProps {
   location: Location;
@@ -20,55 +28,52 @@ export default function LocationCard({
   const { castVote, deleteVote } = useLocations();
 
   return (
-    <Box m={4} borderRadius="md" boxShadow="xl" key={location.id}>
+    <Box m={4} borderRadius="md" key={location.id} width="100%">
       <Image
         src={location.photoUrl}
         alt={location.name}
         objectFit="cover"
         width="100%"
-        height="200px"
-        borderTopRadius="md"
+        height="12rem"
+        borderTopRadius="lg"
       />
-      <Box key={location.id} p={4} bg="gray.100">
-        <Flex align="center">
-          <FaMapMarkerAlt size={24} color="blue.500" />
-          <Text ml={2} fontWeight="bold" fontSize="l">
-            {location.name}
-          </Text>
-        </Flex>
-        <Text mt={2}>{location.address}</Text>
-        <Text mt={2}>{location.creator.username}</Text>
-        <Flex justify="space-between" mt={4}>
-          {/* only show the vote button if the user hasn't voted or suggested a location */}
-          {!votedLocation && !suggestedLocation ? (
-            <Button
-              colorScheme="blue"
-              mr={4}
-              onClick={() => castVote(groupId, eventId, location.id)}
-            >
-              <Text>Vote</Text>
-            </Button>
-          ) : (
-            votedLocation?.id === location.id && (
-              <Button
-                colorScheme="red"
-                mr={4}
-                onClick={() =>
-                  deleteVote(Number(groupId), Number(eventId), location.id)
-                }
-              >
-                <Text>Remove Vote</Text>
-              </Button>
-            )
-          )}
-
-          <Box>
-            {location.voters.map((voter) => (
-              <Text key={voter.id}>{voter.username}</Text>
-            ))}
-          </Box>
-        </Flex>
-      </Box>
+      <HStack justify="space-between" bg="pri.200" p="1rem">
+        <VStack
+          key={location.id}
+          spacing="1rem"
+          align="start"
+          borderBottomRadius="lg"
+        >
+          <Flex gap="0.5rem" align="center">
+            <FiMapPin size="1.25rem" color="white" />
+            <Text fontWeight="bold" fontSize="l" color="sec.100">
+              {location.name}
+            </Text>
+          </Flex>
+          <Text color="sec.200">{location.address}</Text>
+          <Text color="sec.200">{location.creator.username}</Text>
+          <Flex justify="space-between"></Flex>
+        </VStack>
+        <Button
+          onClick={() => {
+            if (votedLocation?.id === location.id) {
+              deleteVote(groupId, eventId, location.id);
+            } else {
+              castVote(groupId, eventId, location.id);
+            }
+          }}
+          // disable button if user has already voted or suggested a location
+          isDisabled={votedLocation || suggestedLocation ? true : false}
+          backgroundColor="sec.100"
+          color="pri.100"
+          // onClick={onSubmit}
+          // isLoading={isLoading}
+          _hover={{ backgroundColor: "sec.200" }}
+          _active={{ backgroundColor: "sec.300" }}
+        >
+          {votedLocation?.id === location.id ? "Remove Vote" : "Vote"}
+        </Button>
+      </HStack>
     </Box>
   );
 }
