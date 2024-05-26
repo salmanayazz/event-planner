@@ -1,9 +1,10 @@
-import { Button, Input, VStack } from "@chakra-ui/react";
+import { Button, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
 import { FiPlus } from "react-icons/fi";
+import ModalInput from "./ModalInput";
 
 export default function Group() {
   const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();
@@ -12,38 +13,35 @@ export default function Group() {
 
   const [newUser, setNewUser] = useState("");
   const [showInput, setShowInput] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toggleInput = () => {
-    setShowInput(!showInput);
-  };
+  async function handleSubmit() {
+    setIsSubmitting(true);
+    await addUserToGroup(groupId, newUser);
+    setIsSubmitting(false);
+    setShowInput(false);
+    setNewUser("");
+  }
 
   return (
     <VStack align="start" width="100%">
       <Header
         title={group?.name || ""}
-        onButtonClick={toggleInput}
+        onButtonClick={() => setShowInput(true)}
         buttonLabel="Add Friend"
         buttonIcon={FiPlus}
       />
 
-      {showInput && (
-        <>
-          <Input
-            placeholder="Enter username"
-            value={newUser}
-            onChange={(event) => setNewUser(event.target.value)}
-          />
-          <Button
-            colorScheme="green"
-            onClick={() => {
-              addUserToGroup(groupId, newUser);
-              toggleInput();
-            }}
-          >
-            Confirm
-          </Button>
-        </>
-      )}
+      <ModalInput
+        isOpen={showInput}
+        onClose={() => setShowInput(false)}
+        header="Add Friend"
+        placeholder="Enter username"
+        value={newUser}
+        onChange={(event) => setNewUser(event.target.value)}
+        onSubmit={handleSubmit}
+        isLoading={isSubmitting}
+      />
 
       <h3>{group?.owner.username}</h3>
       {group?.members.map((user) => (

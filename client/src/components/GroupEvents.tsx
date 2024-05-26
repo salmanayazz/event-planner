@@ -1,4 +1,4 @@
-import { Button, Input, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import { useEvents } from "../contexts/events/EventsContext";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import { EVENT_LINK } from "../links";
 import { NavLink } from "react-router-dom";
 import Header from "../components/Header";
 import { FiPlus } from "react-icons/fi";
+import ModalInput from "./ModalInput";
 
 export default function Group() {
   const { groups } = useGroups();
@@ -16,38 +17,35 @@ export default function Group() {
 
   const [newEvent, setNewEvent] = useState("");
   const [showInput, setShowInput] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toggleInput = () => {
-    setShowInput(!showInput);
-  };
+  async function handleSubmit() {
+    setIsSubmitting(true);
+    await createEvent(groupId, newEvent);
+    setIsSubmitting(false);
+    setShowInput(false);
+    setNewEvent("");
+  }
 
   return (
     <VStack align="start" width="100%">
       <Header
         title={group?.name || ""}
-        onButtonClick={toggleInput}
+        onButtonClick={() => setShowInput(true)}
         buttonLabel="Create Event"
         buttonIcon={FiPlus}
       />
 
-      {showInput && (
-        <>
-          <Input
-            placeholder="Enter event name"
-            value={newEvent}
-            onChange={(event) => setNewEvent(event.target.value)}
-          />
-          <Button
-            colorScheme="green"
-            onClick={() => {
-              createEvent(groupId, newEvent);
-              toggleInput();
-            }}
-          >
-            Confirm
-          </Button>
-        </>
-      )}
+      <ModalInput
+        isOpen={showInput}
+        onClose={() => setShowInput(false)}
+        header="Create Event"
+        placeholder="Enter event name"
+        value={newEvent}
+        onChange={(event) => setNewEvent(event.target.value)}
+        onSubmit={handleSubmit}
+        isLoading={isSubmitting}
+      />
 
       <h2>Events:</h2>
       {events?.map((event) => (
