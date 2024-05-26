@@ -20,7 +20,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/groups" element={<GroupList />} />
-                <Route path="/groups/:groupId" element={<Group />} />
+                <Route path="/groups/:groupId/*" element={<Group />} />
                 <Route
                   path="/groups/:groupId/events/:eventId"
                   element={<Event />}

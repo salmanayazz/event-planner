@@ -2,7 +2,7 @@ import { Grid, HStack, Text, VStack, Box, Divider } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Group } from "../contexts/groups/GroupsContext";
 import { FiCalendar, FiUser } from "react-icons/fi";
-import { GROUP_LINK } from "../links";
+import { GROUP_EVENTS_LINK } from "../links";
 
 interface GroupCardProps {
   groups: Group[];
@@ -21,7 +21,7 @@ export default function GroupCards({ groups }: GroupCardProps) {
       justifyContent="center"
     >
       {groups.map((group) => (
-        <NavLink key={group.id} to={GROUP_LINK(group.id)}>
+        <NavLink key={group.id} to={GROUP_EVENTS_LINK(group.id)}>
           <VStack
             bg="pri.200"
             p={4}

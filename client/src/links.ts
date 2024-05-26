@@ -14,6 +14,10 @@ export const GROUP_LINK = (groupId: number) => {
   return `/groups/${groupId}`;
 };
 
+export const GROUP_EVENTS_LINK = (groupId: number) => {
+  return `/groups/${groupId}/events`;
+};
+
 export const GROUP_USERS_LINK = (groupId: number) => {
   return `/groups/${groupId}/users`;
 };
