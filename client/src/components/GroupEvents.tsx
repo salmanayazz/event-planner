@@ -4,10 +4,10 @@ import { useEvents } from "../contexts/events/EventsContext";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { EVENT_LINK } from "../links";
-import { NavLink } from "react-router-dom";
 import Header from "../components/Header";
-import { FiPlus } from "react-icons/fi";
+import { FiMapPin, FiPlus } from "react-icons/fi";
 import ModalInput from "./ModalInput";
+import Cards from "./Cards";
 
 export default function Group() {
   const { groups } = useGroups();
@@ -28,7 +28,7 @@ export default function Group() {
   }
 
   return (
-    <VStack align="start" width="100%">
+    <VStack align="start" width="100%" spacing="0">
       <Header
         title={group?.name || ""}
         onButtonClick={() => setShowInput(true)}
@@ -47,12 +47,21 @@ export default function Group() {
         isLoading={isSubmitting}
       />
 
-      <h2>Events:</h2>
-      {events?.map((event) => (
-        <NavLink to={EVENT_LINK(groupId, event.id)}>
-          <h3 key={event.id}>{event.name}</h3>
-        </NavLink>
-      ))}
+      <Cards
+        values={events.map((event) => {
+          return {
+            id: event.id,
+            name: event.name,
+            icons: [
+              {
+                type: FiMapPin,
+                label: "TODO",
+              },
+            ],
+          };
+        })}
+        link={(id) => EVENT_LINK(groupId, id)}
+      />
     </VStack>
   );
 }

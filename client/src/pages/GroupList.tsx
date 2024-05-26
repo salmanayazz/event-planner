@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Box, Button, Input, VStack } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import Header from "../components/Header";
-import { FiPlus } from "react-icons/fi";
-import GroupCards from "../components/GroupCards";
+import { FiCalendar, FiPlus, FiUser } from "react-icons/fi";
+import { GROUP_EVENTS_LINK } from "../links";
+import Cards from "../components/Cards";
 
 export default function Groups() {
   const { groups, createGroup } = useGroups();
@@ -40,7 +41,25 @@ export default function Groups() {
         buttonIcon={FiPlus}
       />
 
-      <GroupCards groups={groups} />
+      <Cards
+        values={groups.map((group) => {
+          return {
+            id: group.id,
+            name: group.name,
+            icons: [
+              {
+                type: FiCalendar,
+                label: "TODO",
+              },
+              {
+                type: FiUser,
+                label: (group.members.length + 1).toString(), // +1 for the owner
+              },
+            ],
+          };
+        })}
+        link={(id) => GROUP_EVENTS_LINK(id)}
+      />
 
       {!showCreateGroup ? (
         <Button colorScheme="blue" mt={4} onClick={handleCreateGroup}>
