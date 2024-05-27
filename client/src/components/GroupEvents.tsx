@@ -55,7 +55,7 @@ export default function Group() {
             icons: [
               {
                 type: FiMapPin,
-                label: "TODO",
+                label: (event?.locations?.length || 0).toString(),
               },
             ],
           };

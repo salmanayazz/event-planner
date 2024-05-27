@@ -49,7 +49,7 @@ export default function Groups() {
             icons: [
               {
                 type: FiCalendar,
-                label: "TODO",
+                label: group.events.length.toString(),
               },
               {
                 type: FiUser,

@@ -1,10 +1,12 @@
 import { createContext, useContext } from "react";
+import { Location } from "../locations/LocationsContext";
 
 export interface Event {
   id: number;
   name: string;
   group: number;
   creator: number;
+  locations: Location[] | undefined;
 }
 
 export interface EventsContextType {

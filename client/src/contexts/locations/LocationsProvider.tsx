@@ -2,16 +2,24 @@ import { useState } from "react";
 import { LocationsContext } from "./LocationsContext";
 import { Location } from "./LocationsContext";
 import { axiosInstance } from "../AxiosInstance";
+import { useEvents } from "../events/EventsContext";
 
 interface LocationProviderProps {
   children: React.ReactNode;
 }
 
 const LocationProvider: React.FC<LocationProviderProps> = ({ children }) => {
+  const { events } = useEvents();
   const [locations, setLocations] = useState<Array<Location>>([]);
 
   const getLocations = async (groupId: number, eventId: number) => {
     try {
+      // fetch locations previously fetched from events context
+      setLocations(
+        events.find((event) => event.id === eventId)?.locations || []
+      );
+
+      // refetch for updates
       const response = await axiosInstance.get(
         `groups/${groupId}/events/${eventId}/locations`
       );

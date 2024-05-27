@@ -1,11 +1,13 @@
 import { createContext, useContext } from "react";
 import { User } from "../auth/AuthContext";
+import { Event } from "../events/EventsContext";
 
 export interface Group {
   id: number;
   name: string;
   owner: User;
   members: Array<User>;
+  events: Array<Event>;
 }
 
 export interface GroupsContextType {

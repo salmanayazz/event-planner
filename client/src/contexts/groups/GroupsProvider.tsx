@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { GroupsContext, Group, Event, Location } from "./GroupsContext";
+import { GroupsContext, Group } from "./GroupsContext";
 import { axiosInstance } from "../AxiosInstance";
 
 interface GroupsProviderProps {
@@ -16,7 +16,17 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const getGroups = async () => {
     try {
       const response = await axiosInstance.get(`groups`);
-      setGroups(response.data);
+
+      // get events for each group
+      Promise.all(
+        response.data.map(async (group: Group) => {
+          const events = await axiosInstance.get(`groups/${group.id}/events`);
+          group.events = events.data;
+          return group;
+        })
+      ).then((groups) => {
+        setGroups(groups);
+      });
     } catch (error: unknown) {
       console.log(error);
     }
