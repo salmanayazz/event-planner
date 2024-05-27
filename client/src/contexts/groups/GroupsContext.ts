@@ -14,6 +14,7 @@ export interface GroupsContextType {
   groups: Array<Group>;
   getGroups: () => Promise<void>;
   createGroup: (groupName: string) => Promise<void>;
+  deleteGroup: (groupId: number) => Promise<void>;
   addUserToGroup: (groupId: number, username: string) => Promise<void>;
   deleteUserFromGroup: (groupId: number, userId: number) => Promise<void>;
 }

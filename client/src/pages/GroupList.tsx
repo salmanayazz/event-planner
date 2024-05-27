@@ -8,7 +8,7 @@ import Cards from "../components/Cards";
 import ModalInput from "../components/ModalInput";
 
 export default function Groups() {
-  const { groups, createGroup } = useGroups();
+  const { groups, createGroup, deleteGroup } = useGroups();
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,6 +54,8 @@ export default function Groups() {
           };
         })}
         link={(id) => GROUP_EVENTS_LINK(id)}
+        onDelete={(id) => deleteGroup(id)}
+        onEdit={(id) => console.log("Edit group", id)}
       />
 
       <ModalInput
