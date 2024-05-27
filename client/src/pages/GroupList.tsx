@@ -1,19 +1,17 @@
 import React, { useState } from "react";
-import { Box, Button, Input, VStack } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import Header from "../components/Header";
 import { FiCalendar, FiPlus, FiUser } from "react-icons/fi";
 import { GROUP_EVENTS_LINK } from "../links";
 import Cards from "../components/Cards";
+import ModalInput from "../components/ModalInput";
 
 export default function Groups() {
   const { groups, createGroup } = useGroups();
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [groupName, setGroupName] = useState("");
-
-  const handleCreateGroup = () => {
-    setShowCreateGroup(true);
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleGroupNameChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -21,13 +19,10 @@ export default function Groups() {
     setGroupName(event.target.value);
   };
 
-  const handleConfirmCreateGroup = () => {
+  const handleCreateGroup = () => {
+    setIsSubmitting(true);
     createGroup(groupName);
-    setShowCreateGroup(false);
-    setGroupName("");
-  };
-
-  const handleCancelCreateGroup = () => {
+    setIsSubmitting(false);
     setShowCreateGroup(false);
     setGroupName("");
   };
@@ -36,7 +31,7 @@ export default function Groups() {
     <Box>
       <Header
         title="Groups"
-        onButtonClick={handleCreateGroup}
+        onButtonClick={() => setShowCreateGroup(true)}
         buttonLabel="Create Group"
         buttonIcon={FiPlus}
       />
@@ -61,25 +56,19 @@ export default function Groups() {
         link={(id) => GROUP_EVENTS_LINK(id)}
       />
 
-      {!showCreateGroup ? (
-        <Button colorScheme="blue" mt={4} onClick={handleCreateGroup}>
-          Create New Group
-        </Button>
-      ) : (
-        <VStack spacing={4} align="start" mt={4}>
-          <Input
-            placeholder="Enter group name"
-            value={groupName}
-            onChange={handleGroupNameChange}
-          />
-          <Button colorScheme="green" onClick={handleConfirmCreateGroup}>
-            Confirm
-          </Button>
-          <Button colorScheme="red" onClick={handleCancelCreateGroup}>
-            Cancel
-          </Button>
-        </VStack>
-      )}
+      <ModalInput
+        isOpen={showCreateGroup}
+        onClose={() => {
+          setShowCreateGroup(false);
+          setGroupName("");
+        }}
+        header="Create Group"
+        placeholder="Enter group name"
+        value={groupName}
+        onChange={handleGroupNameChange}
+        onSubmit={handleCreateGroup}
+        isLoading={isSubmitting}
+      />
     </Box>
   );
 }
