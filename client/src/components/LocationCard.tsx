@@ -62,8 +62,13 @@ export default function LocationCard({
               castVote(groupId, eventId, location.id);
             }
           }}
-          // disable button if user has already voted or suggested a location
-          isDisabled={votedLocation || suggestedLocation ? true : false}
+          // disable button if user has voted for another location or has been suggested
+          isDisabled={
+            (votedLocation || suggestedLocation) &&
+            votedLocation?.id !== location.id
+              ? true
+              : false
+          }
           backgroundColor="sec.100"
           color="pri.100"
           // onClick={onSubmit}
