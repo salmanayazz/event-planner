@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/groups/{groupId}/events/{eventId}/locations")
 public class LocationController {
@@ -35,11 +34,11 @@ public class LocationController {
 
     @Autowired
     public LocationController(
-            LocationRepository locationRepository,
-            EventRepository eventRepository,
-            GroupRepository groupRepository,
-            UserRepository userRepository,
-            JwtUtils jwtUtils
+        LocationRepository locationRepository,
+        EventRepository eventRepository,
+        GroupRepository groupRepository,
+        UserRepository userRepository,
+        JwtUtils jwtUtils
     ) {
         this.locationRepository = locationRepository;
         this.eventRepository = eventRepository;
@@ -51,9 +50,9 @@ public class LocationController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getLocations(
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("eventId") Long eventId,
-            HttpServletRequest req
+        @PathVariable("groupId") Long groupId,
+        @PathVariable("eventId") Long eventId,
+        HttpServletRequest req
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
         Group group = groupRepository.findJoined(userId, groupId);
@@ -72,10 +71,10 @@ public class LocationController {
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> createLocation(
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("eventId") Long eventId,
-            @Valid @RequestBody CreateLocationRequest body,
-            HttpServletRequest req
+        @PathVariable("groupId") Long groupId,
+        @PathVariable("eventId") Long eventId,
+        @Valid @RequestBody CreateLocationRequest body,
+        HttpServletRequest req
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
         Group group = groupRepository.findJoined(userId, groupId);
@@ -111,10 +110,10 @@ public class LocationController {
     @PostMapping("/{locationId}/votes")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> castVote(
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("eventId") Long eventId,
-            @PathVariable("locationId") Long locationId,
-            HttpServletRequest req
+        @PathVariable("groupId") Long groupId,
+        @PathVariable("eventId") Long eventId,
+        @PathVariable("locationId") Long locationId,
+        HttpServletRequest req
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
 
@@ -168,11 +167,10 @@ public class LocationController {
     @DeleteMapping("/{locationId}/votes")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> deleteVote(
-            @PathVariable("groupId") Long groupId,
-            @PathVariable("eventId") Long eventId,
-            @PathVariable("locationId") Long locationId,
-            HttpServletRequest req
-
+        @PathVariable("groupId") Long groupId,
+        @PathVariable("eventId") Long eventId,
+        @PathVariable("locationId") Long locationId,
+        HttpServletRequest req
     ) {
         Optional<User> userOptional = userRepository.findById(jwtUtils.getUserIdFromRequest(req));
         if (userOptional.isEmpty()) {

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
@@ -60,9 +59,9 @@ public class GroupController {
     @PostMapping("/{groupId}/users")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> addUser(
-            @PathVariable("groupId") Long groupId,
-            @Valid @RequestBody AddUserRequest req,
-            HttpServletRequest request
+        @PathVariable("groupId") Long groupId,
+        @Valid @RequestBody AddUserRequest req,
+        HttpServletRequest request
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(request);
 
