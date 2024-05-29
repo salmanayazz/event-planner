@@ -3,14 +3,14 @@ import { Button } from "@chakra-ui/react";
 interface StyledButtonProps {
   children: React.ReactNode;
   onClick: () => void;
-  isLoading: boolean;
+  isLoading?: boolean;
   width?: string;
 }
 
 export default function StyledButton({
   children,
   onClick,
-  isLoading,
+  isLoading = false,
   width,
 }: StyledButtonProps) {
   return (
