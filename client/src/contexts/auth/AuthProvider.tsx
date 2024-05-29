@@ -27,8 +27,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       loginUser(email, password);
     } catch (error: unknown) {
       console.log(error);
+      return false;
     }
-    return;
+    return true;
   };
 
   const loginUser = async (email: string, password: string) => {
@@ -51,8 +52,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log(user);
     } catch (error: unknown) {
       console.log(error);
+      return false;
     }
-    return;
+    return true;
   };
 
   const checkAuth = async () => {

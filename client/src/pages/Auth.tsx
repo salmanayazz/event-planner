@@ -12,9 +12,13 @@ import {
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { GROUPS_LINK } from "../links";
 
 export default function Auth() {
   const { signupUser, loginUser } = useAuth();
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,10 +34,15 @@ export default function Auth() {
   };
 
   const handleSubmit = async () => {
+    let result = false;
     if (isLoginMode) {
-      await loginUser(email, password);
+      result = await loginUser(email, password);
     } else {
-      await signupUser(username, email, password);
+      result = await signupUser(username, email, password);
+    }
+
+    if (result) {
+      navigate(GROUPS_LINK());
     }
   };
 
