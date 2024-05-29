@@ -1,6 +1,4 @@
 import {
-  Button,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -9,6 +7,8 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
+import StyledInput from "./StyledInput";
+import StyledButton from "./StyledButton";
 
 interface ModalInputProps {
   isOpen: boolean;
@@ -38,28 +38,18 @@ export default function ModalInput({
         <ModalHeader color="sec.100">{header}</ModalHeader>
         <ModalCloseButton color="sec.100" />
         <ModalBody>
-          <Input
+          <StyledInput
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            backgroundColor="pri.300"
-            borderColor="pri.100"
-            color="sec.100"
-            _placeholder={{ color: "sec.200" }}
-            _focus={{ borderColor: "sec.100", boxShadow: "0 0 0 1px sec.100" }}
           />
         </ModalBody>
         <ModalFooter>
-          <Button
-            backgroundColor="sec.100"
-            color="pri.100"
+          <StyledButton
             onClick={onSubmit}
             isLoading={isLoading}
-            _hover={{ backgroundColor: "sec.200" }}
-            _active={{ backgroundColor: "sec.300" }}
-          >
-            Confirm
-          </Button>
+            children={"Confirm"}
+          />
         </ModalFooter>
       </ModalContent>
     </Modal>

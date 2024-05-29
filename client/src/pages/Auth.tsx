@@ -3,17 +3,18 @@ import {
   Box,
   FormControl,
   FormLabel,
-  Input,
   Button,
   Heading,
   InputRightElement,
-  IconButton,
   InputGroup,
+  VStack,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { GROUPS_LINK } from "../links";
+import StyledInput from "../components/StyledInput";
+import StyledButton from "../components/StyledButton";
 
 export default function Auth() {
   const { signupUser, loginUser } = useAuth();
@@ -53,63 +54,78 @@ export default function Auth() {
       display="flex"
       justifyContent="center"
       alignItems="center"
+      bg="pri.100"
     >
-      <Box p={8} borderRadius="md" boxShadow="xl">
-        <Heading mb={6} textAlign="center">
+      <VStack w="25rem" p="2rem" borderRadius="md" bg="pri.200" spacing="1rem">
+        <Heading mb="1rem" textAlign="center" color="sec.100">
           {isLoginMode ? "Log in" : "Register"}
         </Heading>
+
+        {!isLoginMode && (
+          <FormControl>
+            <FormLabel color="sec.200">Username</FormLabel>
+            <StyledInput
+              placeholder="Enter your username (3 - 20 characters)"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </FormControl>
+        )}
+
         <FormControl>
-          <FormLabel>Username</FormLabel>
-          <Input
-            type="text"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </FormControl>
-        <FormControl mt={4}>
-          <FormLabel>Email</FormLabel>
-          <Input
-            type="text"
+          <FormLabel color="sec.200">Email</FormLabel>
+          <StyledInput
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </FormControl>
-        <FormControl mt={4}>
-          <FormLabel>Password</FormLabel>
+
+        <FormControl>
+          <FormLabel color="sec.200">Password</FormLabel>
           <InputGroup>
-            <Input
+            <StyledInput
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder="Enter your password (6 - 40 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
             <InputRightElement>
-              <IconButton
+              <Button
                 variant="ghost"
-                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
                 onClick={handleTogglePasswordVisibility}
                 aria-label={""}
-              />
+                _hover={{ bg: "transparent" }}
+                color="sec.200"
+              >
+                {showPassword ? <ViewOffIcon /> : <ViewIcon />}
+              </Button>
             </InputRightElement>
           </InputGroup>
         </FormControl>
-        <Button width="full" mt={6} onClick={handleSubmit}>
-          {isLoginMode ? "Log in" : "Register"}
-        </Button>
-        <Button
-          variant="link"
-          width="full"
-          mt={2}
-          onClick={handleModeToggle}
-          textAlign="center"
-        >
-          {isLoginMode
-            ? "New user? Register here"
-            : "Already have an account? Log in"}
-        </Button>
-      </Box>
+
+        <VStack w="100%" mt="1rem">
+          <StyledButton
+            onClick={handleSubmit}
+            isLoading={false}
+            children={isLoginMode ? "Log in" : "Register"}
+            width="full"
+          />
+
+          <Button
+            variant="link"
+            width="full"
+            mt={2}
+            onClick={handleModeToggle}
+            textAlign="center"
+            color="sec.200"
+          >
+            {isLoginMode
+              ? "New user? Register here"
+              : "Already have an account? Log in"}
+          </Button>
+        </VStack>
+      </VStack>
     </Box>
   );
 }
