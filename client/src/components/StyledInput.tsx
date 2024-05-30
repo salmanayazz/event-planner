@@ -5,6 +5,7 @@ interface StyledInputProps {
   placeholder: string;
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isInvalid?: boolean;
 }
 
 export default function StyledInput({
@@ -12,6 +13,7 @@ export default function StyledInput({
   placeholder,
   value,
   onChange,
+  isInvalid = false,
 }: StyledInputProps) {
   return (
     <Input
@@ -24,6 +26,7 @@ export default function StyledInput({
       color="sec.100"
       _placeholder={{ color: "sec.200" }}
       _focus={{ borderColor: "sec.100", boxShadow: "0 0 0 1px sec.100" }}
+      isInvalid={isInvalid}
     />
   );
 }

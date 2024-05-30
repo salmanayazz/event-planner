@@ -13,28 +13,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const signupUser = async (
+  const registerUser = async (
     username: string,
     email: string,
     password: string
   ) => {
     try {
-      await axiosInstance.post(`auth/signup`, {
+      await axiosInstance.post(`auth/register`, {
         username,
         email,
         password,
       });
-      loginUser(email, password);
-    } catch (error: unknown) {
+
+      return loginUser(email, password);
+    } catch (error: any) {
       console.log(error);
-      return false;
+      console.log(error?.response?.data);
+      return error?.response?.data || { message: error.message };
     }
-    return true;
   };
 
   const loginUser = async (email: string, password: string) => {
     try {
-      const response = await axiosInstance.post(`auth/signin`, {
+      const response = await axiosInstance.post(`auth/login`, {
         email,
         password,
       });
@@ -50,16 +51,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: response.data.email,
       });
       console.log(user);
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.log(error);
-      return false;
+      return error?.response?.data || { message: error.message };
     }
-    return true;
   };
 
   const checkAuth = async () => {
     try {
-      const response = await axiosInstance.get(`auth/signin`);
+      const response = await axiosInstance.get(`auth/login`);
       setUser(response.data);
     } catch (error: unknown) {
       console.log(error);
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        signupUser,
+        registerUser,
         loginUser,
         checkAuth,
       }}

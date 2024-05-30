@@ -57,6 +57,27 @@ public class GroupController {
         return ResponseEntity.ok().body("Group created successfully");
     }
 
+    @PutMapping("/{groupId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> editGroup(
+            @PathVariable("groupId") Long groupId,
+            HttpServletRequest req
+    ) {
+        Long userId = jwtUtils.getUserIdFromRequest(req);
+        Optional<Group> group = groupRepository.findById(groupId);
+
+        if (group.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found");
+        }
+
+        if (!Objects.equals(group.get().getOwner().getId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
+        }
+
+        groupRepository.delete(group.get());
+        return ResponseEntity.ok().body("Successfully deleted Group");
+    }
+
     @DeleteMapping("/{groupId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> deleteGroup(

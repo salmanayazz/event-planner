@@ -6,14 +6,24 @@ export interface User {
   email: string;
 }
 
+export interface AuthError {
+  username: string | undefined;
+  email: string | undefined;
+  password: string | undefined;
+  message: string | undefined;
+}
+
 export interface AuthContextType {
   user: User | undefined;
-  signupUser: (
+  registerUser: (
     username: string,
     email: string,
     password: string
-  ) => Promise<boolean>;
-  loginUser: (email: string, password: string) => Promise<boolean>;
+  ) => Promise<AuthError | undefined>;
+  loginUser: (
+    email: string,
+    password: string
+  ) => Promise<AuthError | undefined>;
   checkAuth: () => Promise<void>;
 }
 

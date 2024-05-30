@@ -1,8 +1,8 @@
 package com.example.server.controllers;
 
+import com.example.server.dtos.auth.AuthErrorResponse;
 import com.example.server.dtos.auth.JwtResponse;
 import com.example.server.dtos.auth.LoginRequest;
-import com.example.server.dtos.auth.MessageResponse;
 import com.example.server.dtos.auth.SignupRequest;
 import com.example.server.entities.User;
 import com.example.server.repositories.UserRepository;
@@ -14,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Optional;
 
 @RestController
@@ -37,44 +39,65 @@ public class AuthController {
         this.jwtUtils = jwtUtils;
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                // get userId from email, as userId acts as the spring security username
-                userRepository.findUserIdByEmail(loginRequest.getEmail()),
-                loginRequest.getPassword()
-            )
-        );
+        Long user = userRepository.findUserIdByEmail(loginRequest.getEmail());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        if (user == null) {
+            AuthErrorResponse authErrorResponse = new AuthErrorResponse();
+            authErrorResponse.setEmail("No user exists by this email");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(authErrorResponse);
+        }
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    // get userId from email, as userId acts as the spring security username
+                    user,
+                    loginRequest.getPassword()
+                )
+            );
 
-        return ResponseEntity
-            .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail()));
+        } catch (BadCredentialsException e) {
+            AuthErrorResponse authErrorResponse = new AuthErrorResponse();
+            authErrorResponse.setPassword("Incorrect password");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(authErrorResponse);
+        }
     }
 
-    @GetMapping("/signin")
+    @GetMapping("/login")
     public ResponseEntity<?> checkAuthenticated(HttpServletRequest req) {
         Optional<User> userOptional = userRepository.findById(jwtUtils.getUserIdFromRequest(req));
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
         }
 
-
         return ResponseEntity.ok(userOptional.get());
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        AuthErrorResponse authErrorResponse = new AuthErrorResponse();
+        HttpStatus status = HttpStatus.OK;
+
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+            authErrorResponse.setUsername("Username is already taken");
+            status = HttpStatus.BAD_REQUEST;
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+            authErrorResponse.setEmail("Email is already in use");
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        if (status != HttpStatus.OK) {
+            return ResponseEntity.status(status).body(authErrorResponse);
         }
 
         // create new user's account
@@ -85,7 +108,6 @@ public class AuthController {
         );
 
         userRepository.save(user);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.status(status).body("User registered successfully");
     }
 }
