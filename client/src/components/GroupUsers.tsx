@@ -1,13 +1,24 @@
-import { Button, VStack } from "@chakra-ui/react";
+import {
+  VStack,
+  HStack,
+  Text,
+  IconButton,
+  Box,
+  Icon,
+  Divider,
+} from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
+import { useAuth } from "../contexts/auth/AuthContext";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiTrash2 } from "react-icons/fi";
+import { FaCrown } from "react-icons/fa";
 import ModalInput from "./ModalInput";
 
 export default function Group() {
   const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();
+  const { user } = useAuth();
   const groupId = Number(useParams<{ groupId: string }>().groupId);
   const group = groups.find((group) => group.id === groupId);
 
@@ -24,7 +35,7 @@ export default function Group() {
   }
 
   return (
-    <VStack align="start" width="100%">
+    <VStack width="100%" bg="pri.100">
       <Header
         title={group?.name || ""}
         onButtonClick={() => setShowInput(true)}
@@ -43,15 +54,46 @@ export default function Group() {
         isLoading={isSubmitting}
       />
 
-      <h3>{group?.owner.username}</h3>
-      {group?.members.map((user) => (
-        <Button
-          key={user.id}
-          onClick={() => deleteUserFromGroup(groupId, user.id)}
+      <VStack width="100%" p="1rem" spacing="1rem">
+        <HStack
+          width="100%"
+          bg="pri.200"
+          borderRadius="md"
+          paddingX="1rem"
+          h="4rem"
         >
-          {user.username}
-        </Button>
-      ))}
+          <Icon as={FaCrown} color="sec.100" />
+          <Text fontWeight="bold" fontSize="lg" color="sec.100">
+            {group?.owner.username}
+          </Text>
+        </HStack>
+
+        {group?.members.map((member) => (
+          <HStack
+            key={member.id}
+            width="100%"
+            justifyContent="space-between"
+            h="4rem"
+            paddingX="1rem"
+            bg="pri.200"
+            borderRadius="md"
+          >
+            <Text color="sec.200" fontWeight="bold">
+              {member.username}
+            </Text>
+            {user?.id === group.owner.id && (
+              <IconButton
+                aria-label="Delete member"
+                icon={<FiTrash2 />}
+                color="sec.200"
+                bg="invisible"
+                _hover={{ bg: "pri.300" }}
+                onClick={() => deleteUserFromGroup(groupId, member.id)}
+              />
+            )}
+          </HStack>
+        ))}
+      </VStack>
     </VStack>
   );
 }
