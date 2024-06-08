@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +25,7 @@ public class Event {
     private Long availabilityStartTime;
     private Long availabilityEndTime;
     private Long votingEndTime;
+    private Boolean votingCompleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -41,6 +41,9 @@ public class Event {
     @JsonIgnore
     private List<Location> locations = new ArrayList<>();
 
+    @OneToOne
+    private Location selectedLocation;
+
     public Event() {}
     public Event(
         String name,
@@ -49,6 +52,7 @@ public class Event {
         Long availabilityStartTime,
         Long availabilityEndTime,
         Long votingEndTime,
+        Location selectedLocation,
         Group group,
         User creator
     ) {
@@ -58,6 +62,7 @@ public class Event {
         this.availabilityStartTime = availabilityStartTime;
         this.availabilityEndTime = availabilityEndTime;
         this.votingEndTime = votingEndTime;
+        this.selectedLocation = selectedLocation;
         this.group = group;
         this.creator = creator;
     }
@@ -69,7 +74,7 @@ public class Event {
     public String toString() {
         return "Event{" +
             "id=" + id +
-            ", name='" + name + 
+            ", name='" + name +
             ", startTime=" + startTime +
             ", endTime=" + endTime +
             ", availabilityStartTime=" + availabilityStartTime +

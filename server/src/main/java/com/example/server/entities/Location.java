@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "locations")
+@Getter
+@Setter
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -50,29 +54,6 @@ public class Location {
         this.photoUrl = photoUrl;
         this.creator = creator;
         this.event = event;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public List<User> getVoters() {
-        return voters;
     }
 
     public void deleteVoter(User user) {

@@ -1,12 +1,4 @@
-import {
-  VStack,
-  HStack,
-  Text,
-  IconButton,
-  Box,
-  Icon,
-  Divider,
-} from "@chakra-ui/react";
+import { VStack, HStack, Text, IconButton, Icon } from "@chakra-ui/react";
 import { useGroups } from "../contexts/groups/GroupsContext";
 import { useAuth } from "../contexts/auth/AuthContext";
 import { useState } from "react";
