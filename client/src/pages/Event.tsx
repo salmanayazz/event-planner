@@ -12,7 +12,7 @@ import { FiPlus } from "react-icons/fi";
 export default function EventPage() {
   const { user } = useAuth();
   const { groupId, eventId } = useParams();
-  const { locations, getLocations } = useLocations();
+  const { locations, getLocations, createLocation } = useLocations();
   const { events, getEvents } = useEvents();
 
   const event = events?.find((event: Event) => event.id === Number(eventId));
@@ -24,11 +24,11 @@ export default function EventPage() {
   }, [groupId, eventId]);
 
   const votedLocation: Location | undefined = locations?.find((location) =>
-    location.voters.some((voter: User) => voter.id === user?.id)
+    location?.voters?.some((voter: User) => voter.id === user?.id)
   );
 
   const suggestedLocation: Location | undefined = locations?.find(
-    (location) => location.creator.id === user?.id
+    (location) => location.creator?.id === user?.id
   );
 
   return (
@@ -60,10 +60,18 @@ export default function EventPage() {
       )}
 
       <LocationSelector
-        groupId={Number(groupId)}
-        eventId={Number(eventId)}
         onClose={onClose}
         isOpen={isOpen}
+        onSubmit={(location) => {
+          createLocation(
+            Number(groupId),
+            Number(eventId),
+            location.name,
+            location.address,
+            location.photoUrl
+          );
+          onClose();
+        }}
       />
     </VStack>
   );

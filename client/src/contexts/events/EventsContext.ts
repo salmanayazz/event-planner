@@ -12,7 +12,18 @@ export interface Event {
 export interface EventsContextType {
   events: Array<Event>;
   getEvents: (groupId: number) => Promise<never[] | undefined>;
-  createEvent: (groupId: number, eventName: string) => Promise<void>;
+  createEvent: (
+    groupId: number,
+    data?: {
+      name: string;
+      startTime?: number;
+      endTime?: number;
+      availabilityStartTime?: number;
+      availabilityEndTime?: number;
+      location?: Location;
+      votingEndTime?: number;
+    }
+  ) => Promise<void>;
 }
 
 export const useEvents = () => {

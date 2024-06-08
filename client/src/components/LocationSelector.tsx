@@ -15,26 +15,22 @@ import {
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
-import { useLocations } from "../contexts/locations/LocationsContext";
+import { Location } from "../contexts/locations/LocationsContext";
 
 interface LocationSelectorProps {
-  groupId: number;
-  eventId: number;
   onClose: () => void;
   isOpen: boolean;
+  onSubmit: (location: Location) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const libraries: any = ["places"];
 
 export default function LocationSelector({
-  groupId,
-  eventId,
   onClose,
   isOpen,
+  onSubmit,
 }: LocationSelectorProps) {
-  const { createLocation } = useLocations();
-
   const [selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult>();
   const [searchBox, setSearchBox] =
@@ -42,18 +38,21 @@ export default function LocationSelector({
 
   const handleCreateLocation = async () => {
     if (selectedPlace) {
-      const locationName = selectedPlace.name;
-      const address = selectedPlace.formatted_address;
-      const placeId = selectedPlace.place_id;
+      const location: Location = {
+        name: selectedPlace.name || "",
+        address: selectedPlace.formatted_address || "",
+        placeId: selectedPlace.place_id || "",
+        photoUrl: selectedPlace.photos?.[0].getUrl() || "",
+      };
 
-      if (locationName && address && placeId) {
+      if (location.name && location.address && location.placeId) {
         const placesService = new google.maps.places.PlacesService(
           document.createElement("div")
         );
 
         placesService.getDetails(
           {
-            placeId,
+            placeId: location.placeId,
             fields: ["photo"],
           },
           (placeResult, status) => {
@@ -61,13 +60,7 @@ export default function LocationSelector({
               status === google.maps.places.PlacesServiceStatus.OK &&
               placeResult
             ) {
-              createLocation(
-                Number(groupId),
-                Number(eventId),
-                locationName,
-                address,
-                placeResult.photos?.[0].getUrl() || ""
-              );
+              onSubmit(location);
             }
           }
         );
@@ -96,17 +89,17 @@ export default function LocationSelector({
   }, []);
 
   return (
-    <LoadScript
-      googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-      libraries={libraries}
-      loadingElement={<></>}
-    >
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Select a Location</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Select a Location</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <LoadScript
+            googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+            libraries={libraries}
+            loadingElement={<></>}
+          >
             <StandaloneSearchBox
               onLoad={(ref: google.maps.places.SearchBox) => setSearchBox(ref)}
               onPlacesChanged={onPlacesChanged}
@@ -134,18 +127,18 @@ export default function LocationSelector({
                 />
               )}
             </GoogleMap>
+          </LoadScript>
 
-            <Button
-              colorScheme="green"
-              onClick={handleCreateLocation}
-              mt={4}
-              width="100%"
-            >
-              Confirm Location
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </LoadScript>
+          <Button
+            colorScheme="green"
+            onClick={handleCreateLocation}
+            mt={4}
+            width="100%"
+          >
+            Confirm Location
+          </Button>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

@@ -2,13 +2,14 @@ import { createContext, useContext } from "react";
 import { User } from "../auth/AuthContext";
 
 export interface Location {
-  id: number;
+  id?: number;
   name: string;
   address: string;
+  placeId?: string;
   photoUrl: string;
-  event: Event;
-  creator: User;
-  voters: Array<User>;
+  event?: Event;
+  creator?: User;
+  voters?: Array<User>;
 }
 
 export interface LocationsContextType {

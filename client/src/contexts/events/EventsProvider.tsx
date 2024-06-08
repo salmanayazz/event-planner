@@ -36,11 +36,20 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
     }
   };
 
-  const createEvent = async (groupId: number, eventName: string) => {
+  const createEvent = async (
+    groupId: number,
+    data?: {
+      name: string;
+      startTime?: number;
+      endTime?: number;
+      availabilityStartTime?: number;
+      availabilityEndTime?: number;
+      location?: Location;
+      votingEndTime?: number;
+    }
+  ) => {
     try {
-      await axiosInstance.post(`groups/${groupId}/events`, {
-        name: eventName,
-      });
+      await axiosInstance.post(`groups/${groupId}/events`, data);
       getEvents(groupId);
     } catch (error: unknown) {
       console.log(error);

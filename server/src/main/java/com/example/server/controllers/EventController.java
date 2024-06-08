@@ -48,15 +48,26 @@ public class EventController {
     public ResponseEntity<?> createEvent(@PathVariable("groupId") Long groupId, @Valid @RequestBody CreateEventRequest body, HttpServletRequest req) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
 
+        System.out.println(body.toString());
+
         Optional<Group> groupOptional = groupRepository.findById(groupId);
         if (groupOptional.isEmpty()) {
             return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
         }
 
         Group group = groupOptional.get();
-        Event event = new Event(body.name, userRepository.getReferenceById(userId), group);
+        Event event = new Event(
+            body.getName(),
+            body.getStartTime(),
+            body.getEndTime(),
+            body.getAvailabilityStartTime(),
+            body.getAvailabilityEndTime(),
+            body.getVotingEndTime(),
+            group,
+            userRepository.getReferenceById(userId)
+        );
         eventRepository.save(event);
-
+        System.out.println(event);
         group.addEvent(event);
         groupRepository.save(group);
 

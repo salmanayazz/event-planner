@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "events")
+@Getter
+@Setter
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,6 +21,11 @@ public class Event {
 
     @Size(max = 20)
     private String name;
+    private Long startTime;
+    private Long endTime;
+    private Long availabilityStartTime;
+    private Long availabilityEndTime;
+    private Long votingEndTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -32,33 +42,40 @@ public class Event {
     private List<Location> locations = new ArrayList<>();
 
     public Event() {}
-    public Event(String name, User creator, Group group) {
+    public Event(
+        String name,
+        Long startTime,
+        Long endTime,
+        Long availabilityStartTime,
+        Long availabilityEndTime,
+        Long votingEndTime,
+        Group group,
+        User creator
+    ) {
         this.name = name;
-        this.creator = creator;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.availabilityStartTime = availabilityStartTime;
+        this.availabilityEndTime = availabilityEndTime;
+        this.votingEndTime = votingEndTime;
         this.group = group;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public List<Location> getLocations() {
-        return locations;
+        this.creator = creator;
     }
 
     public void addLocation(Location location) {
         locations.add(location);
+    }
+
+    public String toString() {
+        return "Event{" +
+            "id=" + id +
+            ", name='" + name + 
+            ", startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", availabilityStartTime=" + availabilityStartTime +
+            ", availabilityEndTime=" + availabilityEndTime +
+            ", group=" + group +
+            ", creator=" + creator +
+            '}';
     }
 }

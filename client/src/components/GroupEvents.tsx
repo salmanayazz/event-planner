@@ -6,26 +6,15 @@ import { useParams } from "react-router-dom";
 import { EVENT_LINK } from "../links";
 import Header from "../components/Header";
 import { FiMapPin, FiPlus } from "react-icons/fi";
-import ModalInput from "./ModalInput";
 import Cards from "./Cards";
+import ModalCreateEvent from "./ModalCreateEvent";
 
 export default function Group() {
   const { groups } = useGroups();
-  const { events, createEvent } = useEvents();
+  const { events } = useEvents();
   const groupId = Number(useParams<{ groupId: string }>().groupId);
   const group = groups.find((group) => group.id === groupId);
-
-  const [newEvent, setNewEvent] = useState("");
   const [showInput, setShowInput] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function handleSubmit() {
-    setIsSubmitting(true);
-    await createEvent(groupId, newEvent);
-    setIsSubmitting(false);
-    setShowInput(false);
-    setNewEvent("");
-  }
 
   return (
     <VStack align="start" width="100%" spacing="0">
@@ -36,15 +25,10 @@ export default function Group() {
         buttonIcon={FiPlus}
       />
 
-      <ModalInput
+      <ModalCreateEvent
         isOpen={showInput}
         onClose={() => setShowInput(false)}
-        header="Create Event"
-        placeholder="Enter event name"
-        value={newEvent}
-        onChange={(event) => setNewEvent(event.target.value)}
-        onSubmit={handleSubmit}
-        isLoading={isSubmitting}
+        groupId={groupId}
       />
 
       <Cards
@@ -61,6 +45,8 @@ export default function Group() {
           };
         })}
         link={(id) => EVENT_LINK(groupId, id)}
+        onDelete={(id) => console.log(id)}
+        onEdit={(id) => console.log(id)}
       />
     </VStack>
   );
