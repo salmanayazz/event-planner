@@ -3,12 +3,13 @@ import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import AuthProvider from "./contexts/auth/AuthProvider";
 import GroupList from "./pages/GroupList";
-import Group from "./pages/Group";
 import Event from "./pages/Event";
 import GroupsProvider from "./contexts/groups/GroupsProvider";
 import EventsProvider from "./contexts/events/EventsProvider";
 import LocationsProvider from "./contexts/locations/LocationsProvider";
 import "./App.css";
+import GroupEvents from "./pages/GroupEvents";
+import GroupUsers from "./components/GroupUsers";
 
 function App() {
   return (
@@ -21,7 +22,11 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/groups" element={<GroupList />} />
-                <Route path="/groups/:groupId/*" element={<Group />} />
+                <Route
+                  path="/groups/:groupId/events"
+                  element={<GroupEvents />}
+                />
+                <Route path="/groups/:groupId/users" element={<GroupUsers />} />
                 <Route
                   path="/groups/:groupId/events/:eventId"
                   element={<Event />}
