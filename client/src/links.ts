@@ -29,3 +29,7 @@ export const EVENT_LINK = (groupId: number, eventId: number) => {
 export const EVENT_LOCATIONS_LINK = (groupId: number, eventId: number) => {
   return `/groups/${groupId}/events/${eventId}/locations`;
 };
+
+export const EVENT_AVAILABILITY_LINK = (groupId: number, eventId: number) => {
+  return `/groups/${groupId}/events/${eventId}/availability`;
+};

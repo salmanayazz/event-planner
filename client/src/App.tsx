@@ -11,6 +11,7 @@ import "./App.css";
 import GroupEvents from "./pages/GroupEvents";
 import GroupUsers from "./components/GroupUsers";
 import EventLocations from "./pages/EventLocations";
+import EventAvailability from "./pages/EventAvailability";
 
 function App() {
   return (
@@ -35,6 +36,10 @@ function App() {
                 <Route
                   path="/groups/:groupId/events/:eventId/locations"
                   element={<EventLocations />}
+                />
+                <Route
+                  path="/groups/:groupId/events/:eventId/availability"
+                  element={<EventAvailability />}
                 />
               </Routes>
             </Router>
