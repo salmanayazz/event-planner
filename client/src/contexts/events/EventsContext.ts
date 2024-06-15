@@ -7,11 +7,22 @@ export interface Event {
   group: number;
   creator: number;
   locations: Location[] | undefined;
+  startTime: number;
+  endTime: number;
+  availabilityStartTime: number;
+  availabilityEndTime: number;
+  availabilities: Availability[] | undefined;
+}
+
+export interface Availability {
+  id: number;
+  user: number;
+  time: number;
 }
 
 export interface EventsContextType {
   events: Array<Event>;
-  getEvents: (groupId: number) => Promise<never[] | undefined>;
+  getEvents: (groupId: number) => Promise<void>;
   createEvent: (
     groupId: number,
     data?: {
@@ -23,6 +34,11 @@ export interface EventsContextType {
       location?: Location;
       votingEndTime?: number;
     }
+  ) => Promise<void>;
+  setAvailabilities: (
+    groupId: number,
+    eventId: number,
+    times: number[]
   ) => Promise<void>;
 }
 

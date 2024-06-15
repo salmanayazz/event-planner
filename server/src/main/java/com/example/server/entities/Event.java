@@ -44,6 +44,9 @@ public class Event {
     @OneToOne
     private Location selectedLocation;
 
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Availability> availabilities = new ArrayList<>();
+
     public Event() {}
     public Event(
         String name,

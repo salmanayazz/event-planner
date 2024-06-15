@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from "react";
 import { EventsContext, Event } from "./EventsContext";
 import { axiosInstance } from "../AxiosInstance";
 import { useGroups } from "../groups/GroupsContext";
+import { Location } from "../locations/LocationsContext";
 
 interface EventsProviderProps {
   children: ReactNode;
@@ -19,20 +20,20 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
       // refetch events from server
       const response = await axiosInstance.get(`groups/${groupId}/events`);
       // get locations for each event
-      Promise.all(
-        response.data.map(async (event: Event) => {
-          const locations = await axiosInstance.get(
-            `groups/${groupId}/events/${event.id}/locations`
-          );
-          event.locations = locations.data;
-          return event;
-        })
-      ).then((events) => {
-        setEvents(events);
-      });
+      setEvents(
+        await Promise.all(
+          response.data.map(async (event: Event) => {
+            const locations = await axiosInstance.get(
+              `groups/${groupId}/events/${event.id}/locations`
+            );
+            event.locations = locations.data;
+            return event;
+          })
+        )
+      );
     } catch (error: unknown) {
       console.log(error);
-      return [];
+      return;
     }
   };
 
@@ -56,8 +57,26 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
     }
   };
 
+  const setAvailabilities = async (
+    groupId: number,
+    eventId: number,
+    times: number[]
+  ) => {
+    try {
+      await axiosInstance.post(
+        `groups/${groupId}/events/${eventId}/availabilities`,
+        { times }
+      );
+      getEvents(groupId);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
   return (
-    <EventsContext.Provider value={{ events, getEvents, createEvent }}>
+    <EventsContext.Provider
+      value={{ events, getEvents, createEvent, setAvailabilities }}
+    >
       {children}
     </EventsContext.Provider>
   );

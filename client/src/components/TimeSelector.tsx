@@ -27,12 +27,17 @@ export default function TimeSelector({
   const [dates, setDates] = useState<DateSlot[]>([]);
 
   useEffect(() => {
-    const tempDates = [];
-    const currentDate = new Date(start);
+    const tempDates: DateSlot[] = [];
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const currentDate = new Date(startDate);
+
     // iterate through each day and create a time slot for each hour
-    while (currentDate.getDate() <= new Date(end).getDate()) {
+    while (currentDate <= endDate) {
       const date = new Date(currentDate);
-      const timeSlots = [];
+      const timeSlots: TimeSlot[] = [];
+
       for (let i = 0; i < 24; i++) {
         const time = new Date(
           currentDate.getFullYear(),
@@ -44,13 +49,13 @@ export default function TimeSelector({
           time: time.getTime(),
           // if time for this slot is before start or after end time, disable it
           status:
-            time.getTime() < start || time.getTime() > end
+            time.getTime() < startDate.getTime() ||
+            time.getTime() > endDate.getTime()
               ? "disabled"
               : "not selected",
         });
-        console.log(currentDate.getTime(), start, end);
       }
-      tempDates.push({ date: date.getTime(), timeSlots } as DateSlot);
+      tempDates.push({ date: date.getTime(), timeSlots });
       currentDate.setDate(currentDate.getDate() + 1);
     }
     setDates(tempDates);
@@ -81,16 +86,17 @@ export default function TimeSelector({
     });
 
     setDates(newDates as DateSlot[]);
+    handleSubmit();
+  };
 
-    const enabledTimes = newDates
+  const handleSubmit = () => {
+    const enabledTimes = dates
       .map((dateSlot) =>
         dateSlot.timeSlots
-          .filter((time) => time.status === "selected")
-          .map((time) => time.time)
+          .filter((timeSlot) => timeSlot.status === "selected")
+          .map((timeSlot) => timeSlot.time)
       )
-      .flat()
-      .map((time) => new Date(time).getTime());
-
+      .flat();
     onSubmit(enabledTimes);
   };
 
