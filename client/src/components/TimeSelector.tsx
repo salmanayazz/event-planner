@@ -1,4 +1,4 @@
-import { Button, Heading, Box } from "@chakra-ui/react";
+import { Button, Heading, Box, Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 interface TimeSelectorProps {
@@ -33,17 +33,18 @@ export default function TimeSelector({
 
     const currentDate = new Date(startDate);
 
-    // iterate through each day and create a time slot for each hour
+    // iterate through each day and create a time slot for each 15-minute interval
     while (currentDate <= endDate) {
       const date = new Date(currentDate);
       const timeSlots: TimeSlot[] = [];
 
-      for (let i = 0; i < 24; i++) {
+      for (let i = 0; i < 24 * 4; i++) {
         const time = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),
           currentDate.getDate(),
-          i
+          Math.floor(i / 4),
+          (i % 4) * 15
         );
         timeSlots.push({
           time: time.getTime(),
@@ -101,11 +102,31 @@ export default function TimeSelector({
   };
 
   return (
-    <Box display="table">
-      <Box display="table-row">
-        <Box display="table-cell" />
-        {dates.map((dateSlot) => (
-          <Box key={dateSlot.date} display="table-cell" textAlign="center">
+    <Box>
+      <Flex>
+        <Box width="4rem" />
+        {dates.map((dateSlot, i) => (
+          <Flex
+            key={dateSlot.date}
+            direction="column"
+            align="center"
+            flex="1"
+            justifyContent="end"
+          >
+            {(i === 0 ||
+              (new Date(dateSlot.date).getMonth() === 0 &&
+                new Date(dateSlot.date).getDate() === 1)) && (
+              <Heading size="sm" color="sec.100">
+                {new Date(dateSlot.date).getFullYear()}
+              </Heading>
+            )}
+            {(i === 0 || new Date(dateSlot.date).getDate() === 1) && (
+              <Heading size="sm" color="sec.100">
+                {new Date(dateSlot.date).toLocaleString("default", {
+                  month: "short",
+                })}
+              </Heading>
+            )}
             <Heading size="sm" color="sec.100">
               {new Date(dateSlot.date).getDate()}
             </Heading>
@@ -116,35 +137,46 @@ export default function TimeSelector({
                 ]
               }
             </Heading>
-          </Box>
+          </Flex>
         ))}
-      </Box>
+      </Flex>
       {dates[0]?.timeSlots.map((timeSlot, i) => (
-        <Box key={timeSlot.time} display="table-row">
-          <Box display="table-cell" textAlign="center">
-            <Heading size="sm" color="sec.100">
-              {new Date(timeSlot.time).getHours()}:00
-            </Heading>
-          </Box>
+        <Flex key={timeSlot.time} height="0.4rem" gap="0.3rem">
+          <Flex align="center" justify="center" width="4rem">
+            {i % 4 === 0 && ( // show the label only for each hour
+              <Heading size="sm" color="sec.100">
+                {new Date(timeSlot.time).getHours()}:00
+              </Heading>
+            )}
+          </Flex>
           {dates.map((dateSlot, j) => (
-            <Box key={j} display="table-cell">
+            <Flex
+              key={j}
+              flex="1"
+              align="center"
+              justify="center"
+              height="100%"
+            >
               <Button
-                height="1rem"
+                height="100%"
                 bg={
                   dateSlot.timeSlots[i].status === "selected"
-                    ? "pri.300"
+                    ? "green"
                     : dateSlot.timeSlots[i].status === "not selected"
                     ? "sec.100"
-                    : "gray.100"
+                    : "red"
                 }
                 onClick={() =>
                   handleClick(dateSlot.date, dateSlot.timeSlots[i])
                 }
                 isDisabled={dateSlot.timeSlots[i].status === "disabled"}
+                padding="0"
+                borderRadius="0"
+                mb={i % 4 === 3 ? "0.4rem" : "0"}
               />
-            </Box>
+            </Flex>
           ))}
-        </Box>
+        </Flex>
       ))}
     </Box>
   );
