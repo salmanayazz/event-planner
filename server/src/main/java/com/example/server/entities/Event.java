@@ -74,6 +74,10 @@ public class Event {
         locations.add(location);
     }
 
+    public void addAvailability(Availability availability) {
+        this.availabilities.add(availability);
+    }
+
     public String toString() {
         return "Event{" +
             "id=" + id +

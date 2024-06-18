@@ -1,10 +1,15 @@
-import { Button, Heading, Box, Flex } from "@chakra-ui/react";
+import { Button, Heading, Box, Flex, HStack, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { Availability, Event } from "../contexts/events/EventsContext";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../contexts/auth/AuthContext";
 
 interface TimeSelectorProps {
+  event: Event;
   start: number;
   end: number;
-  onSubmit: (enabledTimes: number[]) => void;
+  onCreate: (time: number) => void;
+  onDelete: (time: number) => void;
 }
 
 type Status = "selected" | "not selected" | "disabled";
@@ -20,13 +25,22 @@ interface DateSlot {
 }
 
 export default function TimeSelector({
+  event,
   start,
   end,
-  onSubmit,
+  onCreate,
+  onDelete,
 }: TimeSelectorProps) {
   const [dates, setDates] = useState<DateSlot[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
+    // place availabilities in a hash map
+    const availabilities = event.availabilities?.reduce((acc, availability) => {
+      acc[availability.time] = availability;
+      return acc;
+    }, {} as Record<number, Availability>);
+
     const tempDates: DateSlot[] = [];
     const startDate = new Date(start);
     const endDate = new Date(end);
@@ -34,7 +48,7 @@ export default function TimeSelector({
     const currentDate = new Date(startDate);
 
     // iterate through each day and create a time slot for each 15-minute interval
-    while (currentDate <= endDate) {
+    while (currentDate.getDate() <= endDate.getDate()) {
       const date = new Date(currentDate);
       const timeSlots: TimeSlot[] = [];
 
@@ -50,9 +64,13 @@ export default function TimeSelector({
           time: time.getTime(),
           // if time for this slot is before start or after end time, disable it
           status:
-            time.getTime() < startDate.getTime() ||
-            time.getTime() > endDate.getTime()
+            time < new Date(event.availabilityStartTime) ||
+            time >= new Date(event.availabilityEndTime)
               ? "disabled"
+              : availabilities?.[time.getTime()]?.users.find(
+                  (u) => u.id === user?.id
+                )
+              ? "selected"
               : "not selected",
         });
       }
@@ -60,58 +78,47 @@ export default function TimeSelector({
       currentDate.setDate(currentDate.getDate() + 1);
     }
     setDates(tempDates);
-  }, [start, end]);
+  }, [
+    end,
+    event.availabilities,
+    event.availabilityEndTime,
+    event.availabilityStartTime,
+    start,
+    user?.id,
+  ]);
 
-  const handleClick = (date: number, timeSlot: TimeSlot) => {
-    const newDates = dates.map((dateSlot) => {
-      if (dateSlot.date === date) {
-        return {
-          date: dateSlot.date,
-          timeSlots: dateSlot.timeSlots.map((time) => {
-            if (time.time === timeSlot.time) {
-              return {
-                time: time.time,
-                status:
-                  time.status === "selected"
-                    ? "not selected"
-                    : time.status === "not selected"
-                    ? "selected"
-                    : time.status,
-              };
-            }
-            return time;
-          }),
-        };
-      }
-      return dateSlot;
-    });
+  const handleClick = (
+    dateSlot: DateSlot,
+    i: number,
+    timeSlot: TimeSlot,
+    j: number
+  ) => {
+    // if the time slot is selected, delete it
+    if (timeSlot.status === "selected") {
+      onDelete(timeSlot.time);
+    } else if (timeSlot.status === "not selected") {
+      onCreate(timeSlot.time);
+    }
+
+    // immediately update the UI
+    const newDates = [...dates];
+    newDates[i].timeSlots[j].status =
+      timeSlot.status === "selected" ? "not selected" : "selected";
 
     setDates(newDates as DateSlot[]);
-    handleSubmit();
-  };
-
-  const handleSubmit = () => {
-    const enabledTimes = dates
-      .map((dateSlot) =>
-        dateSlot.timeSlots
-          .filter((timeSlot) => timeSlot.status === "selected")
-          .map((timeSlot) => timeSlot.time)
-      )
-      .flat();
-    onSubmit(enabledTimes);
   };
 
   return (
-    <Box>
-      <Flex>
-        <Box width="4rem" />
+    <VStack justifyContent="start" alignItems="start">
+      <HStack>
+        <Box width="3rem" />
         {dates.map((dateSlot, i) => (
-          <Flex
-            key={dateSlot.date}
-            direction="column"
+          <VStack
+            key={`date: ${i}`}
+            height="100%"
             align="center"
-            flex="1"
             justifyContent="end"
+            width="3rem"
           >
             {(i === 0 ||
               (new Date(dateSlot.date).getMonth() === 0 &&
@@ -137,47 +144,49 @@ export default function TimeSelector({
                 ]
               }
             </Heading>
-          </Flex>
+          </VStack>
         ))}
-      </Flex>
-      {dates[0]?.timeSlots.map((timeSlot, i) => (
-        <Flex key={timeSlot.time} height="0.4rem" gap="0.3rem">
-          <Flex align="center" justify="center" width="4rem">
-            {i % 4 === 0 && ( // show the label only for each hour
-              <Heading size="sm" color="sec.100">
-                {new Date(timeSlot.time).getHours()}:00
-              </Heading>
-            )}
-          </Flex>
-          {dates.map((dateSlot, j) => (
-            <Flex
-              key={j}
-              flex="1"
-              align="center"
-              justify="center"
-              height="100%"
-            >
+      </HStack>
+
+      <HStack alignItems="start" justifyContent="start">
+        <VStack width="3rem" height="100%" justifyContent="space-evenly">
+          {dates[0]?.timeSlots.map(
+            (timeSlot, i) =>
+              i % 4 === 0 && ( // show the label only for each hour
+                <Heading size="sm" color="sec.100" key={`time: ${i}`}>
+                  {new Date(timeSlot.time).getHours()}:00
+                </Heading>
+              )
+          )}
+        </VStack>
+
+        {dates.map((dateSlot, i) => (
+          <VStack key={`dateSlot: ${i}`} spacing="0">
+            {dateSlot.timeSlots.map((timeSlot, j) => (
               <Button
-                height="100%"
+                key={`timeSlot: ${j}`}
+                height="0.5rem"
+                width="3rem"
                 bg={
-                  dateSlot.timeSlots[i].status === "selected"
+                  timeSlot.status === "selected"
                     ? "green"
-                    : dateSlot.timeSlots[i].status === "not selected"
+                    : timeSlot.status === "not selected"
                     ? "sec.100"
                     : "red"
                 }
-                onClick={() =>
-                  handleClick(dateSlot.date, dateSlot.timeSlots[i])
-                }
-                isDisabled={dateSlot.timeSlots[i].status === "disabled"}
+                onClick={() => {
+                  handleClick(dateSlot, i, timeSlot, j);
+                  console.log("dateSlot.date: " + timeSlot.time);
+                }}
+                isDisabled={timeSlot.status === "disabled"}
                 padding="0"
                 borderRadius="0"
-                mb={i % 4 === 3 ? "0.4rem" : "0"}
+                mb={j % 4 === 3 ? "0.4rem" : "0"}
               />
-            </Flex>
-          ))}
-        </Flex>
-      ))}
-    </Box>
+            ))}
+          </VStack>
+        ))}
+      </HStack>
+    </VStack>
   );
 }

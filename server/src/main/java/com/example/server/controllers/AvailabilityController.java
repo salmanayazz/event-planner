@@ -1,9 +1,10 @@
 package com.example.server.controllers;
 
-import com.example.server.dtos.availability.SetAvailabilitiesRequest;
+import com.example.server.dtos.availability.CreateAvailabilityRequest;
 import com.example.server.entities.Availability;
 import com.example.server.entities.Event;
 import com.example.server.entities.Group;
+import com.example.server.entities.User;
 import com.example.server.repositories.AvailabilityRepository;
 import com.example.server.repositories.EventRepository;
 import com.example.server.repositories.GroupRepository;
@@ -13,8 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/groups/{groupId}/events/{eventId}/availabilities")
@@ -41,13 +41,12 @@ public class AvailabilityController {
     }
 
     @PostMapping
-    public ResponseEntity<?> setAvailabilities(
+    public ResponseEntity<?> createAvailability(
         @PathVariable("groupId") Long groupId,
         @PathVariable("eventId") Long eventId,
-        @RequestBody SetAvailabilitiesRequest body,
+        @RequestBody CreateAvailabilityRequest body,
         HttpServletRequest req
     ) {
-        System.out.println(Arrays.toString(body.getTimes()));
         Long userId = jwtUtils.getUserIdFromRequest(req);
         Group group = groupRepository.findJoined(userId, groupId);
         if (group == null) {
@@ -63,22 +62,30 @@ public class AvailabilityController {
             return ResponseEntity.badRequest().body("Unauthorized to access event or event does not exist");
         }
 
-        ArrayList<Availability> availabilities = new ArrayList<>();
-        for (Long time: body.getTimes()) {
-            if (time <= event.getAvailabilityStartTime() ||
-                time >= event.getAvailabilityEndTime()) {
-                return ResponseEntity.badRequest().body("Availability time outside of event time range");
-            }
-            availabilities.add(new Availability(
-                event,
-                userRepository.getReferenceById(userId),
-                time
-            ));
+        // find availability that matches time in event 
+        Availability availability = event.getAvailabilities().stream().filter(a -> 
+            a.getTime().equals(body.getTime())
+        ).findFirst().orElse(null);
+
+        if (body.getTime() <= event.getAvailabilityStartTime() ||
+            body.getTime() >= event.getAvailabilityEndTime()) {
+            return ResponseEntity.badRequest().body("Availability time outside of event time range");
         }
 
-        availabilityRepository.saveAll(availabilities);
-        event.setAvailabilities(availabilities);
-        eventRepository.save(event);
+        Optional<User> user = userRepository.findById(userId);
+        if (availability == null) {
+            availability = new Availability(
+                event,
+                body.getTime()
+            );
+            event.addAvailability(availability);
+            eventRepository.save(event);
+        } else if (availability.getUsers().contains(user.get())) {
+            return ResponseEntity.badRequest().body("User has already set availability for this time");
+        }
+
+        availability.addUser(user.get());
+        availabilityRepository.save(availability);
 
         return ResponseEntity.ok().body("Successfully created availability");
     }

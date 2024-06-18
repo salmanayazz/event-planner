@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { Location } from "../locations/LocationsContext";
+import { User } from "../auth/AuthContext";
 
 export interface Event {
   id: number;
@@ -16,8 +17,8 @@ export interface Event {
 
 export interface Availability {
   id: number;
-  user: number;
   time: number;
+  users: User[];
 }
 
 export interface EventsContextType {
@@ -35,10 +36,15 @@ export interface EventsContextType {
       votingEndTime?: number;
     }
   ) => Promise<void>;
-  setAvailabilities: (
+  createAvailability: (
     groupId: number,
     eventId: number,
-    times: number[]
+    time: number
+  ) => Promise<void>;
+  deleteAvailability: (
+    groupId: number,
+    eventId: number,
+    time: number
   ) => Promise<void>;
 }
 

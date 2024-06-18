@@ -31,6 +31,7 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
           })
         )
       );
+      setEvents(response.data);
     } catch (error: unknown) {
       console.log(error);
       return;
@@ -57,17 +58,30 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
     }
   };
 
-  const setAvailabilities = async (
+  const createAvailability = async (
     groupId: number,
     eventId: number,
-    times: number[]
+    time: number
   ) => {
     try {
       await axiosInstance.post(
         `groups/${groupId}/events/${eventId}/availabilities`,
-        { times }
+        { time }
       );
-      getEvents(groupId);
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
+  const deleteAvailability = async (
+    groupId: number,
+    eventId: number,
+    time: number
+  ) => {
+    try {
+      await axiosInstance.delete(
+        `groups/${groupId}/events/${eventId}/availabilities/${time}`
+      );
     } catch (error: unknown) {
       console.log(error);
     }
@@ -75,7 +89,13 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
 
   return (
     <EventsContext.Provider
-      value={{ events, getEvents, createEvent, setAvailabilities }}
+      value={{
+        events,
+        getEvents,
+        createEvent,
+        createAvailability,
+        deleteAvailability,
+      }}
     >
       {children}
     </EventsContext.Provider>
