@@ -59,7 +59,7 @@ public class AvailabilityController {
         }
 
         if (event.getVotingCompleted()) {
-            return ResponseEntity.badRequest().body("Unauthorized to access event or event does not exist");
+            return ResponseEntity.badRequest().body("Event voting has concluded");
         }
 
         // find availability that matches time in event 
@@ -73,11 +73,14 @@ public class AvailabilityController {
         }
 
         Optional<User> user = userRepository.findById(userId);
-        if (availability == null) {
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body("User does not exist");
+        } else if (availability == null) {
             availability = new Availability(
                 event,
                 body.getTime()
             );
+            availabilityRepository.save(availability);
             event.addAvailability(availability);
             eventRepository.save(event);
         } else if (availability.getUsers().contains(user.get())) {
@@ -88,5 +91,47 @@ public class AvailabilityController {
         availabilityRepository.save(availability);
 
         return ResponseEntity.ok().body("Successfully created availability");
+    }
+
+    @DeleteMapping("/{availabilityTime}")
+    public ResponseEntity<?> deleteAvailability(
+        @PathVariable("groupId") Long groupId,
+        @PathVariable("eventId") Long eventId,
+        @PathVariable("availabilityTime") Long availabilityTime,
+        HttpServletRequest req
+    ) {
+        Long userId = jwtUtils.getUserIdFromRequest(req);
+        Group group = groupRepository.findJoined(userId, groupId);
+        if (group == null) {
+            return ResponseEntity.badRequest().body("Unauthorized to access group or group does not exist");
+        }
+
+        Event event = group.getEvent(eventId);
+        if (event == null) {
+            return ResponseEntity.badRequest().body("Unauthorized to access event or event does not exist");
+        }
+
+        if (event.getVotingCompleted()) {
+            return ResponseEntity.badRequest().body("Event voting has concluded");
+        }
+
+        // find availability that matches time in event
+        Availability availability = event.getAvailabilities().stream().filter(a ->
+            a.getTime().equals(availabilityTime)
+        ).findFirst().orElse(null);
+
+        User user = userRepository.getReferenceById(userId);
+        if (availability == null) {
+            return ResponseEntity.badRequest().body("Cannot delete availability as it does not exist1");
+        }
+
+        if (!availability.getUsers().contains(user)) {
+            return ResponseEntity.badRequest().body("Cannot delete availability as it does not exist2");
+        }
+
+        availability.removeUser(user);
+        availabilityRepository.save(availability);
+
+        return ResponseEntity.ok().body("Successfully deleted availability");
     }
 }

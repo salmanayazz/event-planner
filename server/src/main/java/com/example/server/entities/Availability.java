@@ -1,13 +1,13 @@
 package com.example.server.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "availability")
@@ -44,5 +44,13 @@ public class Availability {
 
     public void addUser(User user) {
         this.users.add(user);
+    }
+
+    public void removeUser(User user) {
+        this.users.remove(user);
+    }
+
+    public String toString() {
+        return "Availability(id=" + this.id + ", users=" + this.users + ", time=" + this.time + ")";
     }
 }

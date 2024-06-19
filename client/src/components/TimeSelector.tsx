@@ -1,7 +1,6 @@
-import { Button, Heading, Box, Flex, HStack, VStack } from "@chakra-ui/react";
+import { Button, Heading, Box, HStack, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Availability, Event } from "../contexts/events/EventsContext";
-import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/auth/AuthContext";
 
 interface TimeSelectorProps {
@@ -73,37 +72,37 @@ export default function TimeSelector({
               ? "selected"
               : "not selected",
         });
+
+        if (
+          availabilities?.[time.getTime()]?.users.find((u) => u.id === user?.id)
+        ) {
+          console.log(
+            "availabilities: " +
+              availabilities?.[time.getTime()]?.users.find(
+                (u) => u.id === user?.id
+              )?.username
+          );
+        }
       }
+
       tempDates.push({ date: date.getTime(), timeSlots });
       currentDate.setDate(currentDate.getDate() + 1);
     }
     setDates(tempDates);
-  }, [
-    end,
-    event.availabilities,
-    event.availabilityEndTime,
-    event.availabilityStartTime,
-    start,
-    user?.id,
-  ]);
+  }, []);
 
-  const handleClick = (
-    dateSlot: DateSlot,
-    i: number,
-    timeSlot: TimeSlot,
-    j: number
-  ) => {
+  const handleClick = (i: number, j: number) => {
     // if the time slot is selected, delete it
-    if (timeSlot.status === "selected") {
-      onDelete(timeSlot.time);
-    } else if (timeSlot.status === "not selected") {
-      onCreate(timeSlot.time);
+    if (dates[i].timeSlots[j].status === "selected") {
+      onDelete(dates[i].timeSlots[j].time);
+    } else if (dates[i].timeSlots[j].status === "not selected") {
+      onCreate(dates[i].timeSlots[j].time);
     }
 
     // immediately update the UI
     const newDates = [...dates];
     newDates[i].timeSlots[j].status =
-      timeSlot.status === "selected" ? "not selected" : "selected";
+      dates[i].timeSlots[j].status === "selected" ? "not selected" : "selected";
 
     setDates(newDates as DateSlot[]);
   };
@@ -175,7 +174,7 @@ export default function TimeSelector({
                     : "red"
                 }
                 onClick={() => {
-                  handleClick(dateSlot, i, timeSlot, j);
+                  handleClick(i, j);
                   console.log("dateSlot.date: " + timeSlot.time);
                 }}
                 isDisabled={timeSlot.status === "disabled"}
