@@ -19,9 +19,9 @@ export default function Groups() {
     setGroupName(event.target.value);
   };
 
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
     setIsSubmitting(true);
-    createGroup(groupName);
+    await createGroup(groupName);
     setIsSubmitting(false);
     setShowCreateGroup(false);
     setGroupName("");
@@ -54,8 +54,10 @@ export default function Groups() {
           };
         })}
         link={(id) => GROUP_EVENTS_LINK(id)}
-        onDelete={(id) => deleteGroup(id)}
-        onEdit={(id) => console.log("Edit group", id)}
+        onDelete={async (id) => {
+          await deleteGroup(id);
+        }}
+        onEdit={async (id) => console.log("Edit group", id)}
       />
 
       <ModalInput

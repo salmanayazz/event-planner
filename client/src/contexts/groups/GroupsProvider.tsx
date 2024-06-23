@@ -17,16 +17,15 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
     try {
       const response = await axiosInstance.get(`groups`);
 
-      // get events for each group
-      Promise.all(
-        response.data.map(async (group: Group) => {
-          const events = await axiosInstance.get(`groups/${group.id}/events`);
-          group.events = events.data;
-          return group;
-        })
-      ).then((groups) => {
-        setGroups(groups);
-      });
+      setGroups(
+        await Promise.all(
+          response.data.map(async (group: Group) => {
+            const events = await axiosInstance.get(`groups/${group.id}/events`);
+            group.events = events.data;
+            return group;
+          })
+        )
+      );
     } catch (error: unknown) {
       console.log(error);
     }
@@ -37,7 +36,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
       await axiosInstance.post(`groups`, {
         name: groupName,
       });
-      getGroups();
+      await getGroups();
     } catch (error: unknown) {
       console.log(error);
     }
@@ -46,7 +45,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const deleteGroup = async (groupId: number) => {
     try {
       await axiosInstance.delete(`groups/${groupId}`);
-      getGroups();
+      await getGroups();
     } catch (error: unknown) {
       console.log(error);
     }
@@ -57,7 +56,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
       await axiosInstance.post(`groups/${groupId}/users`, {
         username: username,
       });
-      getGroups();
+      await getGroups();
     } catch (error: unknown) {
       console.log(error);
     }
@@ -66,7 +65,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
   const deleteUserFromGroup = async (groupId: number, userId: number) => {
     try {
       await axiosInstance.delete(`groups/${groupId}/users/${userId}`);
-      getGroups();
+      await getGroups();
     } catch (error: unknown) {
       console.log(error);
     }

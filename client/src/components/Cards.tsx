@@ -9,8 +9,8 @@ import ModalConfirmation from "./ModalConfirmation";
 interface CardsProps {
   values: Value[];
   link: (id: number) => string;
-  onDelete: (id: number) => void;
-  onEdit: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
+  onEdit: (id: number) => Promise<void>;
 }
 
 interface Value {
@@ -25,6 +25,7 @@ interface Value {
 export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
   const [deleteValue, setDeleteValue] = useState<Value | undefined>();
   const [editValue, setEditValue] = useState<Value | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <Grid
@@ -51,23 +52,27 @@ export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
           if (!editValue) return;
           setEditValue({ ...editValue, name: e.target.value });
         }}
-        onSubmit={() => {
+        onSubmit={async () => {
           if (!editValue) return;
-          onEdit(editValue.id);
+          setIsSubmitting(true);
+          await onEdit(editValue.id);
+          setIsSubmitting(false);
           setEditValue(undefined);
         }}
-        isLoading={false}
+        isLoading={isSubmitting}
       />
       <ModalConfirmation
         isOpen={deleteValue !== undefined}
         onClose={() => setDeleteValue(undefined)}
         header={`Delete "${deleteValue?.name}"?`}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (!deleteValue) return;
-          onDelete(deleteValue.id);
+          setIsSubmitting(true);
+          await onDelete(deleteValue.id);
+          setIsSubmitting(false);
           setDeleteValue(undefined);
         }}
-        isLoading={false}
+        isLoading={isSubmitting}
       />
 
       {values.map((value) => (
