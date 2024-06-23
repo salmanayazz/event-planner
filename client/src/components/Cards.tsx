@@ -10,7 +10,7 @@ interface CardsProps {
   values: Value[];
   link: (id: number) => string;
   onDelete: (id: number) => Promise<void>;
-  onEdit: (id: number) => Promise<void>;
+  onEdit: (id: number, value: string) => Promise<void>;
 }
 
 interface Value {
@@ -42,9 +42,11 @@ export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
       height="100%"
     >
       <ModalInput
-        // todo
         isOpen={editValue !== undefined}
-        onClose={() => setEditValue(undefined)}
+        onClose={() => {
+          setIsSubmitting(false);
+          setEditValue(undefined);
+        }}
         header="Edit Group"
         placeholder="Group Name"
         value={editValue?.name || ""}
@@ -55,7 +57,7 @@ export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
         onSubmit={async () => {
           if (!editValue) return;
           setIsSubmitting(true);
-          await onEdit(editValue.id);
+          await onEdit(editValue.id, editValue?.name);
           setIsSubmitting(false);
           setEditValue(undefined);
         }}
@@ -63,7 +65,10 @@ export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
       />
       <ModalConfirmation
         isOpen={deleteValue !== undefined}
-        onClose={() => setDeleteValue(undefined)}
+        onClose={() => {
+          setIsSubmitting(false);
+          setDeleteValue(undefined);
+        }}
         header={`Delete "${deleteValue?.name}"?`}
         onConfirm={async () => {
           if (!deleteValue) return;

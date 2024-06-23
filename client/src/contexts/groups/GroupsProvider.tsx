@@ -42,6 +42,17 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
     }
   };
 
+  const editGroup = async (groupId: number, groupName: string) => {
+    try {
+      await axiosInstance.put(`groups/${groupId}`, {
+        name: groupName,
+      });
+      await getGroups();
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
   const deleteGroup = async (groupId: number) => {
     try {
       await axiosInstance.delete(`groups/${groupId}`);
@@ -77,6 +88,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
         groups,
         getGroups,
         createGroup,
+        editGroup,
         deleteGroup,
         addUserToGroup,
         deleteUserFromGroup,

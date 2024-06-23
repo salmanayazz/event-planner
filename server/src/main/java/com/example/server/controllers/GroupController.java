@@ -61,6 +61,7 @@ public class GroupController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> editGroup(
             @PathVariable("groupId") Long groupId,
+            @Valid @RequestBody CreateGroupRequest createGroupRequest,
             HttpServletRequest req
     ) {
         Long userId = jwtUtils.getUserIdFromRequest(req);
@@ -74,8 +75,10 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Not authorized");
         }
 
-        groupRepository.delete(group.get());
-        return ResponseEntity.ok().body("Successfully deleted Group");
+        group.get().setName(createGroupRequest.name);
+        groupRepository.save(group.get());
+
+        return ResponseEntity.ok().body("Successfully edited Group");
     }
 
     @DeleteMapping("/{groupId}")
