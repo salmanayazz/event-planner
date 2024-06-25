@@ -47,10 +47,29 @@ export default function TimeSelector({
   onDelete,
 }: TimeSelectorProps) {
   const [dates, setDates] = useState<DateSlot[]>([]);
-  const [showMidday, setShowMidday] = useState(false);
-  const [datesIndex, setDatesIndex] = useState(0);
-  const dateWindow = 7;
+  const [horizontalDatesIndex, setHorizontalDatesIndex] = useState(0);
+  const [horizontalDateWindow, setHorizontalDateWindow] = useState(1);
+  const [verticalDatesIndex, setVerticalDatesIndex] = useState(0);
+  const [verticalDateWindow, setVerticalDateWindow] = useState(0);
   const { user } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setHorizontalDateWindow(Math.exp(window.innerWidth / 550));
+
+      if (window.innerHeight > 800) {
+        setVerticalDateWindow(12 * 4);
+      } else {
+        setVerticalDateWindow(8 * 4);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     // place availabilities in a hash map
@@ -119,8 +138,10 @@ export default function TimeSelector({
     <VStack justifyContent="center" alignItems="center" width="100%">
       <IconButton
         aria-label="Calendar Up"
-        onClick={() => setShowMidday(false)}
-        visibility={showMidday ? undefined : "hidden"}
+        onClick={() =>
+          setVerticalDatesIndex(verticalDatesIndex - verticalDateWindow)
+        }
+        visibility={verticalDatesIndex !== 0 ? undefined : "hidden"}
         icon={<FiChevronUp size="1.5rem" />}
         color="sec.100"
         bg="pri.200"
@@ -131,8 +152,10 @@ export default function TimeSelector({
       <HStack alignItems="end">
         <IconButton
           aria-label="Calendar Left"
-          onClick={() => setDatesIndex(datesIndex - 1)}
-          visibility={datesIndex > 0 ? undefined : "hidden"}
+          onClick={() =>
+            setHorizontalDatesIndex(horizontalDatesIndex - horizontalDateWindow)
+          }
+          visibility={horizontalDatesIndex > 0 ? undefined : "hidden"}
           margin="auto"
           icon={<FiChevronLeft size="1.5rem" />}
           color="sec.100"
@@ -145,8 +168,8 @@ export default function TimeSelector({
           {dates[0]?.timeSlots.map(
             (timeSlot, i) =>
               i % 4 === 0 && // show the label only for each hour
-              ((showMidday && i >= 12 * 4) || // show only half the day at a time
-                (!showMidday && i < 12 * 4)) && (
+              i >= verticalDatesIndex &&
+              i < verticalDatesIndex + 1 + verticalDateWindow && (
                 <Box height="2.8rem" justifyContent="start">
                   <Heading size="sm" color="sec.100" key={`time: ${i}`}>
                     {new Date(timeSlot.time).getHours()}:00
@@ -158,11 +181,11 @@ export default function TimeSelector({
 
         {dates.map(
           (dateSlot, i) =>
-            i >= datesIndex * dateWindow &&
-            i < (datesIndex + 1) * dateWindow && (
+            i >= horizontalDatesIndex &&
+            i < horizontalDatesIndex + horizontalDateWindow && (
               <VStack key={`dateSlot: ${i}`} spacing="0">
                 <VStack spacing="0.5rem" justifyContent="end" mb="0.5rem">
-                  {(i === datesIndex * dateWindow ||
+                  {(i === horizontalDatesIndex ||
                     (new Date(dateSlot.date).getMonth() === 0 &&
                       new Date(dateSlot.date).getDate() === 1)) && (
                     <Heading size="sm" color="sec.100">
@@ -170,7 +193,7 @@ export default function TimeSelector({
                     </Heading>
                   )}
 
-                  {(i === datesIndex * dateWindow ||
+                  {(i === horizontalDatesIndex ||
                     new Date(dateSlot.date).getDate() === 1) && (
                     <Heading size="sm" color="sec.100">
                       {new Date(dateSlot.date).toLocaleString("default", {
@@ -194,8 +217,8 @@ export default function TimeSelector({
 
                 {dateSlot.timeSlots.map(
                   (timeSlot, j) =>
-                    ((showMidday && j >= 12 * 4) ||
-                      (!showMidday && j < 12 * 4)) && (
+                    j >= verticalDatesIndex &&
+                    j < verticalDatesIndex + verticalDateWindow && (
                       <Button
                         key={`timeSlot: ${j}`}
                         height="0.6rem"
@@ -223,9 +246,13 @@ export default function TimeSelector({
 
         <IconButton
           aria-label="Calendar Right"
-          onClick={() => setDatesIndex(datesIndex + 1)}
+          onClick={() =>
+            setHorizontalDatesIndex(horizontalDatesIndex + horizontalDateWindow)
+          }
           visibility={
-            (datesIndex + 1) * dateWindow < dates.length ? undefined : "hidden"
+            horizontalDatesIndex + horizontalDateWindow < dates.length
+              ? undefined
+              : "hidden"
           }
           margin="auto"
           icon={<FiChevronRight size="1.5rem" />}
@@ -238,8 +265,14 @@ export default function TimeSelector({
 
       <IconButton
         aria-label="Calendar Down"
-        onClick={() => setShowMidday(true)}
-        visibility={!showMidday ? undefined : "hidden"}
+        onClick={() =>
+          setVerticalDatesIndex(verticalDatesIndex + verticalDateWindow)
+        }
+        visibility={
+          verticalDatesIndex + verticalDateWindow < 24 * 4
+            ? undefined
+            : "hidden"
+        }
         icon={<FiChevronDown size="1.5rem" />}
         color="sec.100"
         bg="pri.200"
