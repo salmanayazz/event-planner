@@ -4,22 +4,19 @@ import {
   Box,
   HStack,
   VStack,
-  Icon,
   IconButton,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Availability, Event } from "../contexts/events/EventsContext";
 import { useAuth } from "../contexts/auth/AuthContext";
-import StyledButton from "./StyledButton";
 import {
-  FiArrowLeft,
   FiChevronDown,
   FiChevronLeft,
   FiChevronRight,
   FiChevronUp,
 } from "react-icons/fi";
 
-interface TimeSelectorProps {
+interface AvailabilitySelectorProps {
   event: Event;
   start: number;
   end: number;
@@ -39,13 +36,13 @@ interface DateSlot {
   timeSlots: TimeSlot[];
 }
 
-export default function TimeSelector({
+export default function AvailabilitySelector({
   event,
   start,
   end,
   onCreate,
   onDelete,
-}: TimeSelectorProps) {
+}: AvailabilitySelectorProps) {
   const [dates, setDates] = useState<DateSlot[]>([]);
   const [horizontalDatesIndex, setHorizontalDatesIndex] = useState(0);
   const [horizontalDateWindow, setHorizontalDateWindow] = useState(1);
