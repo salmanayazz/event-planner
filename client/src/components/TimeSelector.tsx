@@ -1,7 +1,23 @@
-import { Button, Heading, Box, HStack, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  Heading,
+  Box,
+  HStack,
+  VStack,
+  Icon,
+  IconButton,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Availability, Event } from "../contexts/events/EventsContext";
 import { useAuth } from "../contexts/auth/AuthContext";
+import StyledButton from "./StyledButton";
+import {
+  FiArrowLeft,
+  FiChevronDown,
+  FiChevronLeft,
+  FiChevronRight,
+  FiChevronUp,
+} from "react-icons/fi";
 
 interface TimeSelectorProps {
   event: Event;
@@ -31,6 +47,9 @@ export default function TimeSelector({
   onDelete,
 }: TimeSelectorProps) {
   const [dates, setDates] = useState<DateSlot[]>([]);
+  const [showMidday, setShowMidday] = useState(false);
+  const [datesIndex, setDatesIndex] = useState(0);
+  const dateWindow = 7;
   const { user } = useAuth();
 
   useEffect(() => {
@@ -72,17 +91,6 @@ export default function TimeSelector({
               ? "selected"
               : "not selected",
         });
-
-        if (
-          availabilities?.[time.getTime()]?.users.find((u) => u.id === user?.id)
-        ) {
-          console.log(
-            "availabilities: " +
-              availabilities?.[time.getTime()]?.users.find(
-                (u) => u.id === user?.id
-              )?.username
-          );
-        }
       }
 
       tempDates.push({ date: date.getTime(), timeSlots });
@@ -108,84 +116,136 @@ export default function TimeSelector({
   };
 
   return (
-    <VStack justifyContent="start" alignItems="start">
-      <HStack>
-        <Box width="3rem" />
-        {dates.map((dateSlot, i) => (
-          <VStack
-            key={`date: ${i}`}
-            height="100%"
-            align="center"
-            justifyContent="end"
-            width="3rem"
-          >
-            {(i === 0 ||
-              (new Date(dateSlot.date).getMonth() === 0 &&
-                new Date(dateSlot.date).getDate() === 1)) && (
-              <Heading size="sm" color="sec.100">
-                {new Date(dateSlot.date).getFullYear()}
-              </Heading>
-            )}
-            {(i === 0 || new Date(dateSlot.date).getDate() === 1) && (
-              <Heading size="sm" color="sec.100">
-                {new Date(dateSlot.date).toLocaleString("default", {
-                  month: "short",
-                })}
-              </Heading>
-            )}
-            <Heading size="sm" color="sec.100">
-              {new Date(dateSlot.date).getDate()}
-            </Heading>
-            <Heading size="sm" color="sec.100">
-              {
-                ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
-                  new Date(dateSlot.date).getDay()
-                ]
-              }
-            </Heading>
-          </VStack>
-        ))}
-      </HStack>
+    <VStack justifyContent="center" alignItems="center" width="100%">
+      <IconButton
+        aria-label="Calendar Up"
+        onClick={() => setShowMidday(false)}
+        visibility={showMidday ? undefined : "hidden"}
+        icon={<FiChevronUp size="1.5rem" />}
+        color="sec.100"
+        bg="pri.200"
+        size="md"
+        _hover={{ bg: "pri.300" }}
+      />
 
-      <HStack alignItems="start" justifyContent="start">
-        <VStack width="3rem" height="100%" justifyContent="space-evenly">
+      <HStack alignItems="end">
+        <IconButton
+          aria-label="Calendar Left"
+          onClick={() => setDatesIndex(datesIndex - 1)}
+          visibility={datesIndex > 0 ? undefined : "hidden"}
+          margin="auto"
+          icon={<FiChevronLeft size="1.5rem" />}
+          color="sec.100"
+          bg="pri.200"
+          size="md"
+          _hover={{ bg: "pri.300" }}
+        />
+
+        <VStack width="3rem" height="100%" justifyContent="end" spacing="0">
           {dates[0]?.timeSlots.map(
             (timeSlot, i) =>
-              i % 4 === 0 && ( // show the label only for each hour
-                <Heading size="sm" color="sec.100" key={`time: ${i}`}>
-                  {new Date(timeSlot.time).getHours()}:00
-                </Heading>
+              i % 4 === 0 && // show the label only for each hour
+              ((showMidday && i >= 12 * 4) || // show only half the day at a time
+                (!showMidday && i < 12 * 4)) && (
+                <Box height="2.8rem" justifyContent="start">
+                  <Heading size="sm" color="sec.100" key={`time: ${i}`}>
+                    {new Date(timeSlot.time).getHours()}:00
+                  </Heading>
+                </Box>
               )
           )}
         </VStack>
 
-        {dates.map((dateSlot, i) => (
-          <VStack key={`dateSlot: ${i}`} spacing="0">
-            {dateSlot.timeSlots.map((timeSlot, j) => (
-              <Button
-                key={`timeSlot: ${j}`}
-                height="0.5rem"
-                width="3rem"
-                bg={
-                  timeSlot.status === "selected"
-                    ? "green"
-                    : timeSlot.status === "not selected"
-                    ? "sec.100"
-                    : "red"
-                }
-                onClick={() => {
-                  handleClick(i, j);
-                  console.log("dateSlot.date: " + timeSlot.time);
-                }}
-                isDisabled={timeSlot.status === "disabled"}
-                padding="0"
-                borderRadius="0"
-                mb={j % 4 === 3 ? "0.4rem" : "0"}
-              />
-            ))}
-          </VStack>
-        ))}
+        {dates.map(
+          (dateSlot, i) =>
+            i >= datesIndex * dateWindow &&
+            i < (datesIndex + 1) * dateWindow && (
+              <VStack key={`dateSlot: ${i}`} spacing="0">
+                <VStack spacing="0.5rem" justifyContent="end" mb="0.5rem">
+                  {(i === datesIndex * dateWindow ||
+                    (new Date(dateSlot.date).getMonth() === 0 &&
+                      new Date(dateSlot.date).getDate() === 1)) && (
+                    <Heading size="sm" color="sec.100">
+                      {new Date(dateSlot.date).getFullYear()}
+                    </Heading>
+                  )}
+
+                  {(i === datesIndex * dateWindow ||
+                    new Date(dateSlot.date).getDate() === 1) && (
+                    <Heading size="sm" color="sec.100">
+                      {new Date(dateSlot.date).toLocaleString("default", {
+                        month: "short",
+                      })}
+                    </Heading>
+                  )}
+
+                  <Heading size="sm" color="sec.100">
+                    {new Date(dateSlot.date).getDate()}
+                  </Heading>
+
+                  <Heading size="sm" color="sec.100">
+                    {
+                      ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+                        new Date(dateSlot.date).getDay()
+                      ]
+                    }
+                  </Heading>
+                </VStack>
+
+                {dateSlot.timeSlots.map(
+                  (timeSlot, j) =>
+                    ((showMidday && j >= 12 * 4) ||
+                      (!showMidday && j < 12 * 4)) && (
+                      <Button
+                        key={`timeSlot: ${j}`}
+                        height="0.6rem"
+                        width="3rem"
+                        bg={
+                          timeSlot.status === "selected"
+                            ? "green"
+                            : timeSlot.status === "not selected"
+                            ? "sec.100"
+                            : "red"
+                        }
+                        onClick={() => {
+                          handleClick(i, j);
+                        }}
+                        isDisabled={timeSlot.status === "disabled"}
+                        padding="0"
+                        borderRadius="0"
+                        mb={j % 4 === 3 ? "0.4rem" : "0"}
+                      />
+                    )
+                )}
+              </VStack>
+            )
+        )}
+
+        <IconButton
+          aria-label="Calendar Right"
+          onClick={() => setDatesIndex(datesIndex + 1)}
+          visibility={
+            (datesIndex + 1) * dateWindow < dates.length ? undefined : "hidden"
+          }
+          margin="auto"
+          icon={<FiChevronRight size="1.5rem" />}
+          color="sec.100"
+          bg="pri.200"
+          size="md"
+          _hover={{ bg: "pri.300" }}
+        />
       </HStack>
+
+      <IconButton
+        aria-label="Calendar Down"
+        onClick={() => setShowMidday(true)}
+        visibility={!showMidday ? undefined : "hidden"}
+        icon={<FiChevronDown size="1.5rem" />}
+        color="sec.100"
+        bg="pri.200"
+        size="md"
+        _hover={{ bg: "pri.300" }}
+      />
     </VStack>
   );
 }
