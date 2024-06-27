@@ -38,7 +38,6 @@ public class Event {
     private User creator;
 
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Location> locations = new ArrayList<>();
 
     @OneToOne

@@ -1,6 +1,7 @@
 package com.example.server.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class Group {
     private List<User> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonIgnoreProperties({"locations", "availabilities"})
     private List<Event> events = new ArrayList<>();
 
     public String toString() {

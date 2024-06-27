@@ -15,17 +15,7 @@ export const GroupsProvider: React.FC<GroupsProviderProps> = ({ children }) => {
 
   const getGroups = async () => {
     try {
-      const response = await axiosInstance.get(`groups`);
-
-      setGroups(
-        await Promise.all(
-          response.data.map(async (group: Group) => {
-            const events = await axiosInstance.get(`groups/${group.id}/events`);
-            group.events = events.data;
-            return group;
-          })
-        )
-      );
+      setGroups((await axiosInstance.get(`groups`)).data);
     } catch (error: unknown) {
       console.log(error);
     }

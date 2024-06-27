@@ -16,22 +16,8 @@ const EventsProvider: React.FC<EventsProviderProps> = ({ children }) => {
     try {
       // fetch events previously fetched from groups context
       setEvents(groups.find((group) => group.id === groupId)?.events || []);
-
       // refetch events from server
-      const response = await axiosInstance.get(`groups/${groupId}/events`);
-      // get locations for each event
-      setEvents(
-        await Promise.all(
-          response.data.map(async (event: Event) => {
-            const locations = await axiosInstance.get(
-              `groups/${groupId}/events/${event.id}/locations`
-            );
-            event.locations = locations.data;
-            return event;
-          })
-        )
-      );
-      setEvents(response.data);
+      setEvents((await axiosInstance.get(`groups/${groupId}/events`)).data);
     } catch (error: unknown) {
       console.log(error);
       return;
