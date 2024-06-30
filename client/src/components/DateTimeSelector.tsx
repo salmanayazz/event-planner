@@ -15,11 +15,6 @@ import {
 import { useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-interface CalendarItem {
-  date?: Date;
-  selected?: boolean;
-}
-
 interface DateTimeSelectorProps {
   onClose: () => void;
   isOpen: boolean;
@@ -36,18 +31,18 @@ export default function DateTimeSelector({
   const [date, setDate] = useState<Date | undefined>();
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
-  const [calendar, setCalendar] = useState<CalendarItem[]>([]);
+  const [calendar, setCalendar] = useState<(Date | undefined)[]>([]);
 
   useEffect(() => {
     const tempDate = new Date(year, month, 1);
-    const tempCalendar: CalendarItem[] = [];
+    const tempCalendar: (Date | undefined)[] = [];
 
     for (let i = 0; i < tempDate.getDay(); i++) {
-      tempCalendar.push({ date: undefined });
+      tempCalendar.push(undefined);
     }
 
     while (tempDate.getMonth() === month) {
-      tempCalendar.push({ date: new Date(tempDate.getTime()) });
+      tempCalendar.push(new Date(tempDate.getTime()));
       tempDate.setDate(tempDate.getDate() + 1);
     }
 
@@ -80,11 +75,12 @@ export default function DateTimeSelector({
             />
 
             <Heading size="sm" color="sec.100">
-              {new Date(
-                calendar[calendar.length - 1]?.date ?? 0
-              ).toLocaleString("default", {
-                month: "long",
-              })}
+              {new Date(calendar[calendar.length - 1] ?? 0).toLocaleString(
+                "default",
+                {
+                  month: "long",
+                }
+              )}
               , {year}
             </Heading>
 
@@ -112,19 +108,21 @@ export default function DateTimeSelector({
                 {day}
               </Heading>
             ))}
-            {calendar.map((calendarItem) =>
-              calendarItem.date ? (
+
+            {calendar.map((calendarDate) =>
+              calendarDate ? (
                 <Button
                   bg="pri.300"
                   color="sec.200"
                   _hover={{ bg: "pri.100", color: "sec.100" }}
                   _active={{ bg: "sec.200", color: "pri.100" }}
-                  isActive={date == calendarItem.date}
+                  isActive={date?.getTime() == calendarDate.getTime()}
                   onClick={() => {
-                    setDate(calendarItem.date);
+                    setDate(calendarDate);
                   }}
+                  key={calendarDate.getTime()}
                 >
-                  {calendarItem.date?.getDate()}
+                  {calendarDate.getDate()}
                 </Button>
               ) : (
                 <Box />
