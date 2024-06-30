@@ -5,6 +5,7 @@ interface StyledButtonProps {
   onClick: () => void;
   isLoading?: boolean;
   width?: string;
+  isDisabled?: boolean;
 }
 
 export default function StyledButton({
@@ -12,6 +13,7 @@ export default function StyledButton({
   onClick,
   isLoading = false,
   width,
+  isDisabled = false,
 }: StyledButtonProps) {
   return (
     <Button
@@ -22,6 +24,7 @@ export default function StyledButton({
       _hover={{ backgroundColor: "sec.200" }}
       _active={{ backgroundColor: "sec.300" }}
       width={width}
+      isDisabled={isDisabled}
     >
       {children}
     </Button>
