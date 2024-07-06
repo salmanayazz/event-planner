@@ -3,7 +3,7 @@ import { Input } from "@chakra-ui/react";
 interface StyledInputProps {
   type?: string;
   placeholder: string;
-  value: string;
+  value?: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   isInvalid?: boolean;
 }

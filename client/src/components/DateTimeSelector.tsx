@@ -62,7 +62,7 @@ export default function DateTimeSelector({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent bg="pri.200">
-        <ModalHeader color="sec.100">Select a Date and Time</ModalHeader>
+        <ModalHeader color="sec.100">Select Time</ModalHeader>
         <ModalCloseButton color="sec.100" />
         <VStack width="100%" padding="1.5rem">
           <HStack width="100%" justifyContent="space-between">
@@ -118,12 +118,12 @@ export default function DateTimeSelector({
             gap="0.25rem"
           >
             {days.map((day) => (
-              <Heading color="sec.200" size="sm" textAlign="center">
+              <Heading color="sec.200" size="sm" textAlign="center" key={day}>
                 {day}
               </Heading>
             ))}
 
-            {calendar.map((calendarDate) =>
+            {calendar.map((calendarDate, i) =>
               calendarDate ? (
                 <Button
                   bg="pri.300"
@@ -147,7 +147,7 @@ export default function DateTimeSelector({
                   {calendarDate.getDate()}
                 </Button>
               ) : (
-                <Box />
+                <Box key={i} />
               )
             )}
           </Grid>

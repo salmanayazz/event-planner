@@ -10,11 +10,11 @@ import {
   HStack,
   Checkbox,
   Text,
-  Input,
   Heading,
   IconButton,
   Tooltip,
   Icon,
+  Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import StyledInput from "./StyledInput";
@@ -23,12 +23,19 @@ import { useEvents } from "../contexts/events/EventsContext";
 import LocationSelector from "./LocationSelector";
 import { Location } from "../contexts/locations/LocationsContext";
 import { FiInfo, FiTrash } from "react-icons/fi";
+import DateTimeSelector from "./DateTimeSelector";
 
 interface ModalInputProps {
   isOpen: boolean;
   onClose: () => void;
   groupId: number;
 }
+
+type dateTimeSelectorOptions =
+  | "none"
+  | "startTime"
+  | "endTime"
+  | "votingEndTime";
 
 export default function ModalInput({
   isOpen,
@@ -39,27 +46,30 @@ export default function ModalInput({
 
   const [name, setName] = useState("");
   const [availabilityEnabled, setAvailabilityEnabled] = useState(false);
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
+  const [startTime, setStartTime] = useState<Date>();
+  const [endTime, setEndTime] = useState<Date>();
   const [location, setLocation] = useState<Location | undefined>(undefined);
-  const [votingEndTime, setVotingEndTime] = useState<string>("");
-  const [openLocationSelector, setOpenLocationSelector] = useState(false);
+  const [votingEndTime, setVotingEndTime] = useState<Date>();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [openLocationSelector, setOpenLocationSelector] = useState(false);
+  const [openDateTimeSelector, setOpenDateTimeSelector] =
+    useState<dateTimeSelectorOptions>("none");
 
   const handleSubmit = async () => {
     setIsLoading(true);
     const data: any = {
       name: name,
-      votingEndTime: new Date(votingEndTime).getTime(),
+      votingEndTime: votingEndTime?.getTime(),
       location: location,
     };
 
     if (availabilityEnabled) {
-      data["availabilityStartTime"] = new Date(startTime).getTime();
-      data["availabilityEndTime"] = new Date(endTime).getTime();
+      data["availabilityStartTime"] = startTime?.getTime();
+      data["availabilityEndTime"] = endTime?.getTime();
     } else {
-      data["startTime"] = new Date(startTime).getTime();
-      data["endTime"] = new Date(endTime).getTime();
+      data["startTime"] = startTime?.getTime();
+      data["endTime"] = endTime?.getTime();
     }
 
     await createEvent(groupId, data);
@@ -71,14 +81,49 @@ export default function ModalInput({
   const onReset = () => {
     setName("");
     setAvailabilityEnabled(false);
-    setStartTime("");
-    setEndTime("");
+    setStartTime(undefined);
+    setEndTime(undefined);
     setLocation(undefined);
-    setVotingEndTime("");
+    setVotingEndTime(undefined);
   };
+
+  const handleDateTimeSelectorSubmit = (date: Date) => {
+    switch (openDateTimeSelector) {
+      case "startTime":
+        setStartTime(date);
+        break;
+      case "endTime":
+        setEndTime(date);
+        break;
+      case "votingEndTime":
+        setVotingEndTime(date);
+        break;
+    }
+    setOpenDateTimeSelector("none");
+  };
+
+  function formatDate(date: Date): string {
+    const hours = date.getHours();
+    let minutes = date.getMinutes().toString();
+
+    // add a leading zero to minutes if it's less than 10
+    minutes = minutes.length < 2 ? "0" + minutes : minutes;
+
+    return `${date.toLocaleString("default", {
+      month: "long",
+      day: "2-digit",
+      year: "numeric",
+    })} at ${hours}:${minutes}`;
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <DateTimeSelector
+        isOpen={openDateTimeSelector != "none"}
+        onClose={() => setOpenDateTimeSelector("none")}
+        onSubmit={handleDateTimeSelectorSubmit}
+      />
+
       <ModalOverlay />
       <ModalContent backgroundColor="pri.200">
         <ModalHeader color="sec.100">Create Event</ModalHeader>
@@ -102,16 +147,21 @@ export default function ModalInput({
                 : "Event Time Frame"}
             </Heading>
             <HStack width="100%">
-              <Input
-                value={startTime?.toString() || ""}
-                onChange={(e) => setStartTime(e.target.value)}
-                type="datetime-local"
-              />
-              <Input
-                value={endTime?.toString() || ""}
-                onChange={(e) => setEndTime(e.target.value)}
-                type="datetime-local"
-              />
+              <Box onClick={() => setOpenDateTimeSelector("startTime")}>
+                <StyledInput
+                  value={startTime ? formatDate(startTime) : undefined}
+                  placeholder="Select a start time"
+                  onChange={() => {}}
+                />
+              </Box>
+
+              <Box onClick={() => setOpenDateTimeSelector("endTime")}>
+                <StyledInput
+                  value={endTime ? formatDate(endTime) : undefined}
+                  placeholder="Select an end time"
+                  onChange={() => {}}
+                />
+              </Box>
             </HStack>
             <HStack
               width="100%"
@@ -181,7 +231,7 @@ export default function ModalInput({
               }}
             />
 
-            {(availabilityEnabled || location) && (
+            {(availabilityEnabled || !location) && (
               <>
                 <Heading
                   size="sm"
@@ -191,11 +241,18 @@ export default function ModalInput({
                 >
                   Voting End Time
                 </Heading>
-                <Input
-                  value={votingEndTime?.toString() || ""}
-                  onChange={(e) => setVotingEndTime(e.target.value)}
-                  type="datetime-local"
-                />
+                <Box
+                  onClick={() => setOpenDateTimeSelector("votingEndTime")}
+                  width="100%"
+                >
+                  <StyledInput
+                    value={
+                      votingEndTime ? formatDate(votingEndTime) : undefined
+                    }
+                    placeholder="Select a voting end time"
+                    onChange={() => {}}
+                  />
+                </Box>
               </>
             )}
           </VStack>
