@@ -141,7 +141,7 @@ export default function ModalInput({
             >
               Allow attendees to select availability
             </Checkbox>
-            <Heading size="sm" color="sec.100" textAlign="left" width="100%">
+            <Heading size="sm" textAlign="left" width="100%">
               {availabilityEnabled
                 ? "Availability Selection Time Frame"
                 : "Event Time Frame"}
@@ -168,7 +168,7 @@ export default function ModalInput({
               justifyContent="space-between"
               alignItems="center"
             >
-              <Heading size="sm" color="sec.100" textAlign="left" width="100%">
+              <Heading size="sm" textAlign="left" width="100%">
                 Location
               </Heading>
               <Tooltip
@@ -204,7 +204,7 @@ export default function ModalInput({
                 px="1rem"
                 borderRadius="md"
               >
-                <Text color="sec.100">Location: {location.name}</Text>
+                <Text>Location: {location.name}</Text>
                 <IconButton
                   onClick={() => setLocation(undefined)}
                   aria-label="Remove Location"
@@ -233,12 +233,7 @@ export default function ModalInput({
 
             {(availabilityEnabled || !location) && (
               <>
-                <Heading
-                  size="sm"
-                  color="sec.100"
-                  textAlign="left"
-                  width="100%"
-                >
+                <Heading size="sm" textAlign="left" width="100%">
                   Voting End Time
                 </Heading>
                 <Box

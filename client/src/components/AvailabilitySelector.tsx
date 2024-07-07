@@ -168,7 +168,7 @@ export default function AvailabilitySelector({
               i >= verticalDatesIndex &&
               i < verticalDatesIndex + 1 + verticalDateWindow && (
                 <Box height="2.8rem" justifyContent="start">
-                  <Heading size="sm" color="sec.100" key={`time: ${i}`}>
+                  <Heading size="sm" key={`time: ${i}`}>
                     {new Date(timeSlot.time).getHours()}:00
                   </Heading>
                 </Box>
@@ -185,25 +185,25 @@ export default function AvailabilitySelector({
                   {(i === horizontalDatesIndex ||
                     (new Date(dateSlot.date).getMonth() === 0 &&
                       new Date(dateSlot.date).getDate() === 1)) && (
-                    <Heading size="sm" color="sec.100">
+                    <Heading size="sm">
                       {new Date(dateSlot.date).getFullYear()}
                     </Heading>
                   )}
 
                   {(i === horizontalDatesIndex ||
                     new Date(dateSlot.date).getDate() === 1) && (
-                    <Heading size="sm" color="sec.100">
+                    <Heading size="sm">
                       {new Date(dateSlot.date).toLocaleString("default", {
                         month: "short",
                       })}
                     </Heading>
                   )}
 
-                  <Heading size="sm" color="sec.100">
+                  <Heading size="sm">
                     {new Date(dateSlot.date).getDate()}
                   </Heading>
 
-                  <Heading size="sm" color="sec.100">
+                  <Heading size="sm">
                     {
                       ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
                         new Date(dateSlot.date).getDay()

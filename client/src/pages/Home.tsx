@@ -17,8 +17,8 @@ export default function Home() {
       p="2rem"
       bg="linear-gradient(190deg, rgb(75, 75, 75), rgb(0, 0, 0))"
     >
-      <Heading color="sec.100">Event Planner</Heading>
-      <Text fontSize="xl" textAlign="center" maxW="md" color="sec.200">
+      <Heading>Event Planner</Heading>
+      <Text fontSize="xl" textAlign="center" maxW="md">
         Welcome to the Event Planner! Vote on locations with your friends and
         make planning events easier.
       </Text>

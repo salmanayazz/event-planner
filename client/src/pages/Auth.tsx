@@ -123,7 +123,7 @@ export default function Auth() {
         bg="pri.200"
         spacing="0.75rem"
       >
-        <Heading mb="1rem" textAlign="center" color="sec.100">
+        <Heading mb="1rem" textAlign="center">
           {isLoginMode ? "Log in" : "Register"}
         </Heading>
 

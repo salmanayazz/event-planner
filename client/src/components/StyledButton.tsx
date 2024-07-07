@@ -17,12 +17,8 @@ export default function StyledButton({
 }: StyledButtonProps) {
   return (
     <Button
-      backgroundColor="sec.100"
-      color="pri.100"
       onClick={onClick}
       isLoading={isLoading}
-      _hover={{ backgroundColor: "sec.200" }}
-      _active={{ backgroundColor: "sec.300" }}
       width={width}
       isDisabled={isDisabled}
     >

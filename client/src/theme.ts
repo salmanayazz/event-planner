@@ -13,4 +13,16 @@ export const customTheme = extendTheme({
       200: "#d4d4d8",
     },
   },
+  components: {
+    Heading: {
+      baseStyle: {
+        color: "sec.100",
+      },
+    },
+    Text: {
+      baseStyle: {
+        color: "sec.200",
+      },
+    },
+  },
 });

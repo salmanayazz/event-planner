@@ -40,11 +40,7 @@ const Header: React.FC<HeaderProps> = ({
       zIndex="1"
     >
       <Flex align="center" justify="space-between" height="100%" paddingX={4}>
-        <Heading
-          as="h1"
-          fontSize={`${1.5 * scrollMultiplier}rem`}
-          color="sec.100"
-        >
+        <Heading as="h1" fontSize={`${1.5 * scrollMultiplier}rem`}>
           {title}
         </Heading>
         <Button

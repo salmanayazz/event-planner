@@ -57,7 +57,7 @@ export default function EventLocations() {
         </VStack>
 
         {!suggestedLocation && (
-          <Button colorScheme="green" onClick={onOpen} mt={4}>
+          <Button onClick={onOpen} mt={4}>
             Add a Location
           </Button>
         )}

@@ -83,7 +83,7 @@ export default function DateTimeSelector({
               _hover={{ bg: "pri.100" }}
             />
 
-            <Heading size="sm" color="sec.100">
+            <Heading size="sm">
               {new Date(calendar[calendar.length - 1] ?? 0).toLocaleString(
                 "default",
                 {
@@ -176,9 +176,7 @@ export default function DateTimeSelector({
                 justifyContent="center"
                 py="0.25rem"
               >
-                <Heading size="lg" color="sec.100">
-                  {date.getHours()}
-                </Heading>
+                <Heading size="lg">{date.getHours()}</Heading>
               </Flex>
 
               <Icon
@@ -197,9 +195,7 @@ export default function DateTimeSelector({
               />
             </VStack>
 
-            <Heading size="lg" color="sec.100">
-              :
-            </Heading>
+            <Heading size="lg">:</Heading>
 
             <VStack>
               <Icon
@@ -224,9 +220,7 @@ export default function DateTimeSelector({
                 justifyContent="center"
                 py="0.25rem"
               >
-                <Heading size="lg" color="sec.100">
-                  {date.getMinutes()}
-                </Heading>
+                <Heading size="lg">{date.getMinutes()}</Heading>
               </Flex>
 
               <Icon

@@ -64,7 +64,7 @@ export default function Group() {
             h="4rem"
           >
             <Icon as={FaCrown} color="sec.100" />
-            <Text fontWeight="bold" fontSize="lg" color="sec.100">
+            <Text fontWeight="bold" fontSize="lg">
               {group?.owner.username}
             </Text>
           </HStack>
@@ -79,9 +79,7 @@ export default function Group() {
               bg="pri.200"
               borderRadius="md"
             >
-              <Text color="sec.200" fontWeight="bold">
-                {member.username}
-              </Text>
+              <Text fontWeight="bold">{member.username}</Text>
               {user?.id === group.owner.id && (
                 <IconButton
                   aria-label="Delete member"

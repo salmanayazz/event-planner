@@ -46,12 +46,12 @@ export default function LocationCard({
         >
           <Flex gap="0.5rem" align="center">
             <FiMapPin size="1.25rem" color="white" />
-            <Text fontWeight="bold" fontSize="l" color="sec.100">
+            <Text fontWeight="bold" fontSize="l">
               {location.name}
             </Text>
           </Flex>
-          <Text color="sec.200">{location.address}</Text>
-          <Text color="sec.200">{location.creator?.username}</Text>
+          <Text>{location.address}</Text>
+          <Text>{location.creator?.username}</Text>
           <Flex justify="space-between"></Flex>
         </VStack>
         <Button
