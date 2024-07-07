@@ -51,14 +51,14 @@ export default function LocationCard({
             </Text>
           </Flex>
           <Text color="sec.200">{location.address}</Text>
-          <Text color="sec.200">{location.creator.username}</Text>
+          <Text color="sec.200">{location.creator?.username}</Text>
           <Flex justify="space-between"></Flex>
         </VStack>
         <Button
           onClick={() => {
-            if (votedLocation?.id === location.id) {
+            if (location.id && votedLocation?.id === location.id) {
               deleteVote(groupId, eventId, location.id);
-            } else {
+            } else if (location.id) {
               castVote(groupId, eventId, location.id);
             }
           }}

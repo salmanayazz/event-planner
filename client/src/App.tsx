@@ -12,6 +12,10 @@ import GroupEvents from "./pages/GroupEvents";
 import GroupUsers from "./components/GroupUsers";
 import EventLocations from "./pages/EventLocations";
 import EventAvailability from "./pages/EventAvailability";
+import { LoadScript } from "@react-google-maps/api";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const libraries: any = ["places"];
 
 function App() {
   return (
@@ -19,30 +23,39 @@ function App() {
       <GroupsProvider>
         <EventsProvider>
           <LocationsProvider>
-            <Router>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/groups" element={<GroupList />} />
-                <Route
-                  path="/groups/:groupId/events"
-                  element={<GroupEvents />}
-                />
-                <Route path="/groups/:groupId/users" element={<GroupUsers />} />
-                <Route
-                  path="/groups/:groupId/events/:eventId"
-                  element={<Event />}
-                />
-                <Route
-                  path="/groups/:groupId/events/:eventId/locations"
-                  element={<EventLocations />}
-                />
-                <Route
-                  path="/groups/:groupId/events/:eventId/availability"
-                  element={<EventAvailability />}
-                />
-              </Routes>
-            </Router>
+            <LoadScript
+              googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+              libraries={libraries}
+              loadingElement={<></>}
+            >
+              <Router>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/groups" element={<GroupList />} />
+                  <Route
+                    path="/groups/:groupId/events"
+                    element={<GroupEvents />}
+                  />
+                  <Route
+                    path="/groups/:groupId/users"
+                    element={<GroupUsers />}
+                  />
+                  <Route
+                    path="/groups/:groupId/events/:eventId"
+                    element={<Event />}
+                  />
+                  <Route
+                    path="/groups/:groupId/events/:eventId/locations"
+                    element={<EventLocations />}
+                  />
+                  <Route
+                    path="/groups/:groupId/events/:eventId/availability"
+                    element={<EventAvailability />}
+                  />
+                </Routes>
+              </Router>
+            </LoadScript>
           </LocationsProvider>
         </EventsProvider>
       </GroupsProvider>

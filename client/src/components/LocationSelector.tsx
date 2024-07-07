@@ -9,12 +9,7 @@ import {
   ModalCloseButton,
   Input,
 } from "@chakra-ui/react";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  StandaloneSearchBox,
-} from "@react-google-maps/api";
+import { GoogleMap, Marker, StandaloneSearchBox } from "@react-google-maps/api";
 import { Location } from "../contexts/locations/LocationsContext";
 
 interface LocationSelectorProps {
@@ -22,9 +17,6 @@ interface LocationSelectorProps {
   isOpen: boolean;
   onSubmit: (location: Location) => void;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const libraries: any = ["places"];
 
 export default function LocationSelector({
   onClose,
@@ -95,39 +87,33 @@ export default function LocationSelector({
         <ModalHeader>Select a Location</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <LoadScript
-            googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-            libraries={libraries}
-            loadingElement={<></>}
+          <StandaloneSearchBox
+            onLoad={(ref: google.maps.places.SearchBox) => setSearchBox(ref)}
+            onPlacesChanged={onPlacesChanged}
           >
-            <StandaloneSearchBox
-              onLoad={(ref: google.maps.places.SearchBox) => setSearchBox(ref)}
-              onPlacesChanged={onPlacesChanged}
-            >
-              <Input id="search-input" placeholder="Search for a place" />
-            </StandaloneSearchBox>
-            <GoogleMap
-              center={
-                selectedPlace
-                  ? {
-                      lat: selectedPlace.geometry?.location?.lat() || 0,
-                      lng: selectedPlace.geometry?.location?.lng() || 0,
-                    }
-                  : { lat: 0, lng: 0 }
-              }
-              zoom={15}
-              mapContainerStyle={{ height: "400px", width: "100%" }}
-            >
-              {selectedPlace && (
-                <Marker
-                  position={{
+            <Input id="search-input" placeholder="Search for a place" />
+          </StandaloneSearchBox>
+          <GoogleMap
+            center={
+              selectedPlace
+                ? {
                     lat: selectedPlace.geometry?.location?.lat() || 0,
                     lng: selectedPlace.geometry?.location?.lng() || 0,
-                  }}
-                />
-              )}
-            </GoogleMap>
-          </LoadScript>
+                  }
+                : { lat: 0, lng: 0 }
+            }
+            zoom={15}
+            mapContainerStyle={{ height: "400px", width: "100%" }}
+          >
+            {selectedPlace && (
+              <Marker
+                position={{
+                  lat: selectedPlace.geometry?.location?.lat() || 0,
+                  lng: selectedPlace.geometry?.location?.lng() || 0,
+                }}
+              />
+            )}
+          </GoogleMap>
 
           <Button
             colorScheme="green"
