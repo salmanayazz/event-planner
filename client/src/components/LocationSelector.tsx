@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import {
-  Button,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  Input,
+  Flex,
+  ModalFooter,
 } from "@chakra-ui/react";
 import { GoogleMap, Marker, StandaloneSearchBox } from "@react-google-maps/api";
 import { Location } from "../contexts/locations/LocationsContext";
+import StyledInput from "./StyledInput";
+import StyledButton from "./StyledButton";
 
 interface LocationSelectorProps {
   onClose: () => void;
@@ -27,6 +29,11 @@ export default function LocationSelector({
     useState<google.maps.places.PlaceResult>();
   const [searchBox, setSearchBox] =
     useState<google.maps.places.SearchBox | null>();
+
+  useEffect(() => {
+    console.log("selected place");
+    console.log(selectedPlace);
+  }, [selectedPlace]);
 
   const handleCreateLocation = async () => {
     if (selectedPlace) {
@@ -83,47 +90,56 @@ export default function LocationSelector({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Select a Location</ModalHeader>
-        <ModalCloseButton />
+      <ModalContent bg="pri.200">
+        <ModalHeader color="sec.100">Select a Location</ModalHeader>
+        <ModalCloseButton color="sec.100" />
         <ModalBody>
-          <StandaloneSearchBox
-            onLoad={(ref: google.maps.places.SearchBox) => setSearchBox(ref)}
-            onPlacesChanged={onPlacesChanged}
-          >
-            <Input id="search-input" placeholder="Search for a place" />
-          </StandaloneSearchBox>
-          <GoogleMap
-            center={
-              selectedPlace
-                ? {
+          <Flex direction="column" gap="1rem">
+            <StandaloneSearchBox
+              onLoad={(ref: google.maps.places.SearchBox) => setSearchBox(ref)}
+              onPlacesChanged={onPlacesChanged}
+            >
+              <StyledInput
+                id="search-input"
+                placeholder="Search for a place"
+                onChange={() => {}}
+              />
+            </StandaloneSearchBox>
+            <GoogleMap
+              center={
+                selectedPlace
+                  ? {
+                      lat: selectedPlace.geometry?.location?.lat() || 0,
+                      lng: selectedPlace.geometry?.location?.lng() || 0,
+                    }
+                  : { lat: 0, lng: 0 }
+              }
+              zoom={15}
+              mapContainerStyle={{
+                height: "400px",
+                width: "100%",
+                borderRadius: "2%",
+              }}
+            >
+              {selectedPlace && (
+                <Marker
+                  position={{
                     lat: selectedPlace.geometry?.location?.lat() || 0,
                     lng: selectedPlace.geometry?.location?.lng() || 0,
-                  }
-                : { lat: 0, lng: 0 }
-            }
-            zoom={15}
-            mapContainerStyle={{ height: "400px", width: "100%" }}
-          >
-            {selectedPlace && (
-              <Marker
-                position={{
-                  lat: selectedPlace.geometry?.location?.lat() || 0,
-                  lng: selectedPlace.geometry?.location?.lng() || 0,
-                }}
-              />
-            )}
-          </GoogleMap>
-
-          <Button
-            colorScheme="green"
+                  }}
+                />
+              )}
+            </GoogleMap>
+          </Flex>
+        </ModalBody>
+        <ModalFooter>
+          <StyledButton
             onClick={handleCreateLocation}
-            mt={4}
-            width="100%"
+            isDisabled={!selectedPlace}
           >
             Confirm Location
-          </Button>
-        </ModalBody>
+          </StyledButton>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );
