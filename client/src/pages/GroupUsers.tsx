@@ -4,11 +4,11 @@ import { useEvents } from "../contexts/events/EventsContext";
 import { useAuth } from "../contexts/auth/AuthContext";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Header from "./Header";
+import Header from "../components/Header";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 import { FaCrown } from "react-icons/fa";
-import ModalInput from "./ModalInput";
-import GroupSidebar from "./GroupSidebar";
+import ModalInput from "../components/ModalInput";
+import GroupSidebar from "../components/GroupSidebar";
 
 export default function Group() {
   const { groups, addUserToGroup, deleteUserFromGroup } = useGroups();

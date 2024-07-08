@@ -9,7 +9,7 @@ import EventsProvider from "./contexts/events/EventsProvider";
 import LocationsProvider from "./contexts/locations/LocationsProvider";
 import "./App.css";
 import GroupEvents from "./pages/GroupEvents";
-import GroupUsers from "./components/GroupUsers";
+import GroupUsers from "./pages/GroupUsers";
 import EventLocations from "./pages/EventLocations";
 import EventAvailability from "./pages/EventAvailability";
 import { LoadScript } from "@react-google-maps/api";
