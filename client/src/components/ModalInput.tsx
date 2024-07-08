@@ -61,6 +61,7 @@ export default function ModalInput({
             onClick={handleSubmit}
             isLoading={isLoading}
             children={"Confirm"}
+            isDisabled={value == ""}
           />
         </ModalFooter>
       </ModalContent>
