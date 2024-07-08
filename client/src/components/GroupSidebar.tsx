@@ -1,7 +1,11 @@
 import Sidebar from "./Sidebar";
-import { FiCalendar, FiUsers } from "react-icons/fi";
+import { FiCalendar, FiSettings, FiUsers } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { GROUP_EVENTS_LINK, GROUP_USERS_LINK } from "../links";
+import {
+  GROUP_EVENTS_LINK,
+  GROUP_SETTINGS_LINK,
+  GROUP_USERS_LINK,
+} from "../links";
 
 interface GroupSidebarProps {
   groupId: number;
@@ -27,6 +31,14 @@ export default function GroupSidebar({ groupId }: GroupSidebarProps) {
             navigate(GROUP_USERS_LINK(groupId), { replace: true });
           },
           selected: window.location.pathname === GROUP_USERS_LINK(groupId),
+        },
+        {
+          icon: FiSettings,
+          label: "settings",
+          onClick: () => {
+            navigate(GROUP_SETTINGS_LINK(groupId), { replace: true });
+          },
+          selected: window.location.pathname === GROUP_SETTINGS_LINK(groupId),
         },
       ]}
     />

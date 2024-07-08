@@ -13,6 +13,7 @@ import GroupUsers from "./components/GroupUsers";
 import EventLocations from "./pages/EventLocations";
 import EventAvailability from "./pages/EventAvailability";
 import { LoadScript } from "@react-google-maps/api";
+import GroupSettings from "./pages/GroupSettings";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const libraries: any = ["places"];
@@ -40,6 +41,10 @@ function App() {
                   <Route
                     path="/groups/:groupId/users"
                     element={<GroupUsers />}
+                  />
+                  <Route
+                    path="/groups/:groupId/settings"
+                    element={<GroupSettings />}
                   />
                   <Route
                     path="/groups/:groupId/events/:eventId"

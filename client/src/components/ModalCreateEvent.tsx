@@ -17,7 +17,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import StyledInput from "./StyledInput";
+import StyledInput from "../pages/StyledInput";
 import StyledButton from "./StyledButton";
 import { useEvents } from "../contexts/events/EventsContext";
 import LocationSelector from "./LocationSelector";

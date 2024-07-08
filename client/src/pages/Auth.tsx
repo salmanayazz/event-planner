@@ -14,7 +14,7 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { AuthError, useAuth } from "../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { GROUPS_LINK } from "../links";
-import StyledInput from "../components/StyledInput";
+import StyledInput from "./StyledInput";
 import StyledButton from "../components/StyledButton";
 
 export default function Auth() {

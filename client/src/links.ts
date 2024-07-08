@@ -22,6 +22,10 @@ export const GROUP_USERS_LINK = (groupId: number) => {
   return `/groups/${groupId}/users`;
 };
 
+export const GROUP_SETTINGS_LINK = (groupId: number) => {
+  return `/groups/${groupId}/settings`;
+};
+
 export const EVENT_LINK = (groupId: number, eventId: number) => {
   return `/groups/${groupId}/events/${eventId}`;
 };

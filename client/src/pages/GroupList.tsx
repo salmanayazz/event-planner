@@ -8,23 +8,11 @@ import Cards from "../components/Cards";
 import ModalInput from "../components/ModalInput";
 
 export default function Groups() {
-  const { groups, createGroup, editGroup, deleteGroup } = useGroups();
+  const { groups, createGroup } = useGroups();
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [groupName, setGroupName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleGroupNameChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setGroupName(event.target.value);
-  };
-
-  const handleCreateGroup = async () => {
-    setIsSubmitting(true);
+  const handleCreateGroup = async (groupName: string) => {
     await createGroup(groupName);
-    setIsSubmitting(false);
-    setShowCreateGroup(false);
-    setGroupName("");
   };
 
   return (
@@ -54,24 +42,17 @@ export default function Groups() {
           };
         })}
         link={(id) => GROUP_EVENTS_LINK(id)}
-        onDelete={async (id) => {
-          await deleteGroup(id);
-        }}
-        onEdit={async (id, name) => editGroup(id, name)}
       />
 
       <ModalInput
         isOpen={showCreateGroup}
         onClose={() => {
           setShowCreateGroup(false);
-          setGroupName("");
         }}
         header="Create Group"
         placeholder="Enter group name"
-        value={groupName}
-        onChange={handleGroupNameChange}
+        inputValue={""}
         onSubmit={handleCreateGroup}
-        isLoading={isSubmitting}
       />
     </Box>
   );

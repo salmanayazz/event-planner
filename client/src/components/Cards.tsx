@@ -1,16 +1,11 @@
 import { Grid, HStack, Text, VStack, Box, Divider } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
-import React, { useState } from "react";
+import React from "react";
 import { IconType } from "react-icons";
-import { FiEdit3, FiTrash2 } from "react-icons/fi";
-import ModalInput from "./ModalInput";
-import ModalConfirmation from "./ModalConfirmation";
 
 interface CardsProps {
   values: Value[];
   link: (id: number) => string;
-  onDelete: (id: number) => Promise<void>;
-  onEdit: (id: number, value: string) => Promise<void>;
 }
 
 interface Value {
@@ -22,11 +17,7 @@ interface Value {
   }[];
 }
 
-export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
-  const [deleteValue, setDeleteValue] = useState<Value | undefined>();
-  const [editValue, setEditValue] = useState<Value | undefined>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+export default function Cards({ values, link }: CardsProps) {
   return (
     <Grid
       templateColumns={{
@@ -41,45 +32,6 @@ export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
       width="100%"
       height="100%"
     >
-      <ModalInput
-        isOpen={editValue !== undefined}
-        onClose={() => {
-          setIsSubmitting(false);
-          setEditValue(undefined);
-        }}
-        header="Edit Group"
-        placeholder="Group Name"
-        value={editValue?.name || ""}
-        onChange={(e) => {
-          if (!editValue) return;
-          setEditValue({ ...editValue, name: e.target.value });
-        }}
-        onSubmit={async () => {
-          if (!editValue) return;
-          setIsSubmitting(true);
-          await onEdit(editValue.id, editValue?.name);
-          setIsSubmitting(false);
-          setEditValue(undefined);
-        }}
-        isLoading={isSubmitting}
-      />
-      <ModalConfirmation
-        isOpen={deleteValue !== undefined}
-        onClose={() => {
-          setIsSubmitting(false);
-          setDeleteValue(undefined);
-        }}
-        header={`Delete "${deleteValue?.name}"?`}
-        onConfirm={async () => {
-          if (!deleteValue) return;
-          setIsSubmitting(true);
-          await onDelete(deleteValue.id);
-          setIsSubmitting(false);
-          setDeleteValue(undefined);
-        }}
-        isLoading={isSubmitting}
-      />
-
       {values.map((value) => (
         <NavLink key={value.id} to={link(value.id)}>
           <VStack
@@ -90,33 +42,9 @@ export default function Cards({ values, link, onDelete, onEdit }: CardsProps) {
             align="start"
             spacing="1.5rem"
           >
-            <HStack justify="space-between" w="100%">
-              <Text fontSize="lg" fontWeight="bold" color="sec.100">
-                {value.name}
-              </Text>
-
-              <HStack spacing="1rem">
-                <FiEdit3
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setEditValue(value);
-                  }}
-                  size="1.25em"
-                  color="white"
-                />
-
-                <FiTrash2
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDeleteValue(value);
-                  }}
-                  size="1.25em"
-                  color="white"
-                />
-              </HStack>
-            </HStack>
+            <Text fontSize="lg" fontWeight="bold" color="sec.100">
+              {value.name}
+            </Text>
 
             <Divider color="sec.200" />
 

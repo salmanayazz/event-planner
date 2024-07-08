@@ -7,13 +7,13 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import StyledButton from "./StyledButton";
+import { useState } from "react";
 
 interface ModalInputProps {
   isOpen: boolean;
   onClose: () => void;
   header: string;
-  onConfirm: () => void;
-  isLoading: boolean;
+  onConfirm: () => Promise<void>;
 }
 
 export default function ModalInput({
@@ -21,8 +21,16 @@ export default function ModalInput({
   onClose,
   header,
   onConfirm,
-  isLoading,
 }: ModalInputProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleConfirm() {
+    setIsLoading(true);
+    await onConfirm();
+    setIsLoading(false);
+    onClose();
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -32,7 +40,7 @@ export default function ModalInput({
 
         <ModalFooter>
           <StyledButton
-            onClick={onConfirm}
+            onClick={handleConfirm}
             isLoading={isLoading}
             children={"Confirm"}
           />

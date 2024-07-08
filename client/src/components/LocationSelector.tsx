@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { GoogleMap, Marker, StandaloneSearchBox } from "@react-google-maps/api";
 import { Location } from "../contexts/locations/LocationsContext";
-import StyledInput from "./StyledInput";
+import StyledInput from "../pages/StyledInput";
 import StyledButton from "./StyledButton";
 
 interface LocationSelectorProps {

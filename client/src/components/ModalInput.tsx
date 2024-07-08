@@ -7,18 +7,17 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
-import StyledInput from "./StyledInput";
+import StyledInput from "../pages/StyledInput";
 import StyledButton from "./StyledButton";
+import { useState } from "react";
 
 interface ModalInputProps {
   isOpen: boolean;
   onClose: () => void;
   header: string;
   placeholder: string;
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: () => void;
-  isLoading: boolean;
+  inputValue?: string;
+  onSubmit: (value: string) => Promise<void>;
 }
 
 export default function ModalInput({
@@ -26,13 +25,26 @@ export default function ModalInput({
   onClose,
   header,
   placeholder,
-  value,
-  onChange,
+  inputValue = "",
   onSubmit,
-  isLoading,
 }: ModalInputProps) {
+  const [value, setValue] = useState(inputValue);
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit() {
+    setIsLoading(true);
+    await onSubmit(value);
+    handleClose();
+  }
+
+  function handleClose() {
+    setIsLoading(false);
+    setValue("");
+    onClose();
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+    <Modal isOpen={isOpen} onClose={handleClose} isCentered>
       <ModalOverlay />
       <ModalContent backgroundColor="pri.200">
         <ModalHeader color="sec.100">{header}</ModalHeader>
@@ -41,12 +53,12 @@ export default function ModalInput({
           <StyledInput
             placeholder={placeholder}
             value={value}
-            onChange={onChange}
+            onChange={(e) => setValue(e.target.value)}
           />
         </ModalBody>
         <ModalFooter>
           <StyledButton
-            onClick={onSubmit}
+            onClick={handleSubmit}
             isLoading={isLoading}
             children={"Confirm"}
           />

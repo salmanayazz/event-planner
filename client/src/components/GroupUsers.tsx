@@ -17,20 +17,14 @@ export default function Group() {
   const groupId = Number(useParams<{ groupId: string }>().groupId);
   const group = groups.find((group) => group.id === groupId);
 
-  const [newUser, setNewUser] = useState("");
   const [showInput, setShowInput] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     getEvents(groupId);
   }, [groupId]);
 
-  async function handleSubmit() {
-    setIsSubmitting(true);
-    await addUserToGroup(groupId, newUser);
-    setIsSubmitting(false);
-    setShowInput(false);
-    setNewUser("");
+  async function handleSubmit(user: string) {
+    await addUserToGroup(groupId, user);
   }
 
   return (
@@ -49,10 +43,8 @@ export default function Group() {
           onClose={() => setShowInput(false)}
           header="Add Friend"
           placeholder="Enter username"
-          value={newUser}
-          onChange={(event) => setNewUser(event.target.value)}
+          inputValue={""}
           onSubmit={handleSubmit}
-          isLoading={isSubmitting}
         />
 
         <VStack width="100%" p="1rem" spacing="1rem">
