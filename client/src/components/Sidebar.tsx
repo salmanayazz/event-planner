@@ -58,7 +58,6 @@ export default function Sidebar({ items }: SidebarProps) {
             onClick={handleToggle}
             mb={4}
             variant="outline"
-            colorScheme="whiteAlpha"
             size="sm"
           />
           <VStack

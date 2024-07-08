@@ -8,11 +8,11 @@ import {
   ModalCloseButton,
   Flex,
   ModalFooter,
+  Button,
+  Input,
 } from "@chakra-ui/react";
 import { GoogleMap, Marker, StandaloneSearchBox } from "@react-google-maps/api";
 import { Location } from "../contexts/locations/LocationsContext";
-import StyledInput from "../pages/StyledInput";
-import StyledButton from "./StyledButton";
 
 interface LocationSelectorProps {
   onClose: () => void;
@@ -90,16 +90,16 @@ export default function LocationSelector({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent bg="pri.200">
-        <ModalHeader color="sec.100">Select a Location</ModalHeader>
-        <ModalCloseButton color="sec.100" />
+      <ModalContent>
+        <ModalHeader>Select a Location</ModalHeader>
+        <ModalCloseButton />
         <ModalBody>
           <Flex direction="column" gap="1rem">
             <StandaloneSearchBox
               onLoad={(ref: google.maps.places.SearchBox) => setSearchBox(ref)}
               onPlacesChanged={onPlacesChanged}
             >
-              <StyledInput
+              <Input
                 id="search-input"
                 placeholder="Search for a place"
                 onChange={() => {}}
@@ -133,12 +133,9 @@ export default function LocationSelector({
           </Flex>
         </ModalBody>
         <ModalFooter>
-          <StyledButton
-            onClick={handleCreateLocation}
-            isDisabled={!selectedPlace}
-          >
+          <Button onClick={handleCreateLocation} isDisabled={!selectedPlace}>
             Confirm Location
-          </StyledButton>
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

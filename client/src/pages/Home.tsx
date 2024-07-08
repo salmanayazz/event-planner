@@ -1,8 +1,7 @@
 import { useAuth } from "../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { AUTH_LINK, GROUPS_LINK } from "../links";
-import { VStack, Heading, Text } from "@chakra-ui/react";
-import StyledButton from "../components/StyledButton";
+import { VStack, Heading, Text, Button } from "@chakra-ui/react";
 
 export default function Home() {
   const { user } = useAuth();
@@ -23,13 +22,9 @@ export default function Home() {
         make planning events easier.
       </Text>
       {user ? (
-        <StyledButton onClick={() => navigate(GROUPS_LINK())}>
-          Go to groups
-        </StyledButton>
+        <Button onClick={() => navigate(GROUPS_LINK())}>Go to groups</Button>
       ) : (
-        <StyledButton onClick={() => navigate(AUTH_LINK())}>
-          Log in
-        </StyledButton>
+        <Button onClick={() => navigate(AUTH_LINK())}>Log in</Button>
       )}
     </VStack>
   );

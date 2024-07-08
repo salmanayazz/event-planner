@@ -5,8 +5,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Button,
 } from "@chakra-ui/react";
-import StyledButton from "./StyledButton";
 import { useState } from "react";
 
 interface ModalInputProps {
@@ -34,12 +34,12 @@ export default function ModalInput({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
-      <ModalContent backgroundColor="pri.200">
-        <ModalHeader color="sec.100">{header}</ModalHeader>
-        <ModalCloseButton color="sec.100" />
+      <ModalContent>
+        <ModalHeader>{header}</ModalHeader>
+        <ModalCloseButton />
 
         <ModalFooter>
-          <StyledButton
+          <Button
             onClick={handleConfirm}
             isLoading={isLoading}
             children={"Confirm"}

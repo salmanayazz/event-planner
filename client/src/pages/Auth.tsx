@@ -9,13 +9,12 @@ import {
   InputGroup,
   VStack,
   useToast,
+  Input,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { AuthError, useAuth } from "../contexts/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { GROUPS_LINK } from "../links";
-import StyledInput from "./StyledInput";
-import StyledButton from "../components/StyledButton";
 
 export default function Auth() {
   const { registerUser, loginUser } = useAuth();
@@ -130,7 +129,7 @@ export default function Auth() {
         {!isLoginMode && (
           <FormControl>
             <FormLabel color="sec.200">Username</FormLabel>
-            <StyledInput
+            <Input
               placeholder="Enter your username (3 - 20 characters)"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -143,7 +142,7 @@ export default function Auth() {
 
         <FormControl>
           <FormLabel color="sec.200">Email</FormLabel>
-          <StyledInput
+          <Input
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -156,7 +155,7 @@ export default function Auth() {
         <FormControl>
           <FormLabel color="sec.200">Password</FormLabel>
           <InputGroup>
-            <StyledInput
+            <Input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password (6 - 40 characters)"
               value={password}
@@ -180,7 +179,7 @@ export default function Auth() {
         </FormControl>
 
         <VStack w="100%" mt="1rem">
-          <StyledButton
+          <Button
             onClick={handleSubmit}
             children={isLoginMode ? "Log in" : "Register"}
             width="full"

@@ -15,10 +15,10 @@ import {
   Tooltip,
   Icon,
   Box,
+  Button,
+  Input,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import StyledInput from "../pages/StyledInput";
-import StyledButton from "./StyledButton";
 import { useEvents } from "../contexts/events/EventsContext";
 import LocationSelector from "./LocationSelector";
 import { Location } from "../contexts/locations/LocationsContext";
@@ -125,12 +125,12 @@ export default function ModalInput({
       />
 
       <ModalOverlay />
-      <ModalContent backgroundColor="pri.200">
-        <ModalHeader color="sec.100">Create Event</ModalHeader>
-        <ModalCloseButton color="sec.100" />
+      <ModalContent>
+        <ModalHeader>Create Event</ModalHeader>
+        <ModalCloseButton />
         <ModalBody>
           <VStack spacing="1rem" color="sec.100" alignItems="start">
-            <StyledInput
+            <Input
               placeholder="Event Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -148,7 +148,7 @@ export default function ModalInput({
             </Heading>
             <HStack width="100%">
               <Box onClick={() => setOpenDateTimeSelector("startTime")}>
-                <StyledInput
+                <Input
                   value={startTime ? formatDate(startTime) : undefined}
                   placeholder="Select a start time"
                   onChange={() => {}}
@@ -156,7 +156,7 @@ export default function ModalInput({
               </Box>
 
               <Box onClick={() => setOpenDateTimeSelector("endTime")}>
-                <StyledInput
+                <Input
                   value={endTime ? formatDate(endTime) : undefined}
                   placeholder="Select an end time"
                   onChange={() => {}}
@@ -215,11 +215,12 @@ export default function ModalInput({
                 />
               </HStack>
             ) : (
-              <StyledButton
+              <Button
                 onClick={() => setOpenLocationSelector(true)}
-                children="Set Location"
                 width="full"
-              />
+              >
+                Set Location
+              </Button>
             )}
 
             <LocationSelector
@@ -240,7 +241,7 @@ export default function ModalInput({
                   onClick={() => setOpenDateTimeSelector("votingEndTime")}
                   width="100%"
                 >
-                  <StyledInput
+                  <Input
                     value={
                       votingEndTime ? formatDate(votingEndTime) : undefined
                     }
@@ -253,7 +254,7 @@ export default function ModalInput({
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <StyledButton
+          <Button
             onClick={handleSubmit}
             isLoading={isLoading}
             children={"Confirm"}

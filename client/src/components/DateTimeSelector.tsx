@@ -21,7 +21,6 @@ import {
   FiChevronRight,
   FiChevronUp,
 } from "react-icons/fi";
-import StyledButton from "./StyledButton";
 
 interface DateTimeSelectorProps {
   onClose: () => void;
@@ -61,9 +60,9 @@ export default function DateTimeSelector({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
-      <ModalContent bg="pri.200">
-        <ModalHeader color="sec.100">Select Time</ModalHeader>
-        <ModalCloseButton color="sec.100" />
+      <ModalContent>
+        <ModalHeader>Select Time</ModalHeader>
+        <ModalCloseButton />
         <VStack width="100%" padding="1.5rem">
           <HStack width="100%" justifyContent="space-between">
             <IconButton
@@ -76,11 +75,8 @@ export default function DateTimeSelector({
                   setMonth(month - 1);
                 }
               }}
-              icon={<FiChevronLeft size="1.5rem" />}
-              color="sec.100"
-              bg="pri.300"
-              size="md"
-              _hover={{ bg: "pri.100" }}
+              icon={<FiChevronLeft />}
+              variant="muted"
             />
 
             <Heading size="sm">
@@ -103,11 +99,8 @@ export default function DateTimeSelector({
                   setMonth(month + 1);
                 }
               }}
-              icon={<FiChevronRight size="1.5rem" />}
-              color="sec.100"
-              bg="pri.300"
-              size="md"
-              _hover={{ bg: "pri.100" }}
+              icon={<FiChevronRight />}
+              variant="muted"
             />
           </HStack>
 
@@ -240,12 +233,9 @@ export default function DateTimeSelector({
             </VStack>
           </HStack>
           <HStack justifyContent="end" width="100%">
-            <StyledButton
-              onClick={() => onSubmit(date)}
-              isDisabled={!hasSelected}
-            >
+            <Button onClick={() => onSubmit(date)} isDisabled={!hasSelected}>
               Confirm
-            </StyledButton>
+            </Button>
           </HStack>
         </VStack>
       </ModalContent>

@@ -58,6 +58,7 @@ export default function GroupSettings() {
               onClick={() => setOpenEditName(true)}
               icon={<FiEdit3 />}
               aria-label={"Edit group name"}
+              variant="muted"
             />
           </HStack>
 
@@ -79,6 +80,7 @@ export default function GroupSettings() {
               onClick={() => setOpenDeleteGroup(true)}
               icon={<FiTrash2 />}
               aria-label={"Delete group"}
+              variant="muted"
             />
           </HStack>
         </VStack>

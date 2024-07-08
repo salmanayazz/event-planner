@@ -76,10 +76,8 @@ export default function Group() {
                 <IconButton
                   aria-label="Delete member"
                   icon={<FiTrash2 />}
-                  color="sec.200"
-                  bg="invisible"
-                  _hover={{ bg: "pri.300" }}
                   onClick={() => deleteUserFromGroup(groupId, member.id)}
+                  variant="muted"
                 />
               )}
             </HStack>
