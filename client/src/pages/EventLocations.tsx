@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Flex, useDisclosure, VStack } from "@chakra-ui/react";
+import { Flex, useDisclosure, VStack } from "@chakra-ui/react";
 import { User, useAuth } from "../contexts/auth/AuthContext";
 import { useEvents, Event } from "../contexts/events/EventsContext";
 import { useLocations, Location } from "../contexts/locations/LocationsContext";
@@ -41,6 +41,9 @@ export default function EventLocations() {
           onButtonClick={onOpen}
           buttonLabel="Suggest Location"
           buttonIcon={FiPlus}
+          buttonDisabled={
+            votedLocation != undefined || suggestedLocation != undefined
+          }
         />
 
         <VStack spacing="0" width="100%" padding="1rem">
@@ -55,12 +58,6 @@ export default function EventLocations() {
             />
           ))}
         </VStack>
-
-        {!suggestedLocation && (
-          <Button onClick={onOpen} mt={4}>
-            Add a Location
-          </Button>
-        )}
 
         <LocationSelector
           onClose={onClose}

@@ -7,6 +7,7 @@ interface HeaderProps {
   buttonIcon: IconType;
   buttonLabel: string;
   onButtonClick: () => void;
+  buttonDisabled?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -14,6 +15,7 @@ const Header: React.FC<HeaderProps> = ({
   buttonIcon,
   buttonLabel,
   onButtonClick,
+  buttonDisabled = false,
 }) => {
   const [scrollMultiplier, setScrollMultiplier] = useState(2);
 
@@ -49,6 +51,7 @@ const Header: React.FC<HeaderProps> = ({
           color={scrollMultiplier == 1 ? "sec.100" : "pri.200"}
           variant={scrollMultiplier == 1 ? "outline" : "solid"}
           leftIcon={React.createElement(buttonIcon)}
+          isDisabled={buttonDisabled}
         >
           {buttonLabel}
         </Button>
