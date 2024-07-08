@@ -22,7 +22,7 @@ import { useState } from "react";
 import { useEvents } from "../contexts/events/EventsContext";
 import LocationSelector from "./LocationSelector";
 import { Location } from "../contexts/locations/LocationsContext";
-import { FiInfo, FiTrash } from "react-icons/fi";
+import { FiInfo, FiTrash2 } from "react-icons/fi";
 import DateTimeSelector from "./DateTimeSelector";
 
 interface ModalInputProps {
@@ -198,20 +198,17 @@ export default function ModalInput({
             {location ? (
               <HStack
                 width="100%"
-                border="1px solid"
+                bg="sec.100"
                 borderColor="sec.100"
                 justifyContent="space-between"
-                px="1rem"
+                p="0.2rem 1rem"
                 borderRadius="md"
               >
-                <Text>Location: {location.name}</Text>
+                <Text color="pri.100">{location.name}</Text>
                 <IconButton
                   onClick={() => setLocation(undefined)}
                   aria-label="Remove Location"
-                  icon={<FiTrash />}
-                  bg="transparent"
-                  color="sec.100"
-                  _hover={{ bg: "transparent" }}
+                  icon={<FiTrash2 />}
                 />
               </HStack>
             ) : (
@@ -258,6 +255,13 @@ export default function ModalInput({
             onClick={handleSubmit}
             isLoading={isLoading}
             children={"Confirm"}
+            isDisabled={
+              name == "" ||
+              startTime == undefined ||
+              endTime == undefined ||
+              ((availabilityEnabled || location == undefined) &&
+                votingEndTime == undefined)
+            }
           />
         </ModalFooter>
       </ModalContent>
